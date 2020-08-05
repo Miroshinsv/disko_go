@@ -4,17 +4,14 @@ import (
 	db "disko/utils"
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 type Roles struct {
-	Id         int
+	gorm.Model
 	Name       string
-	CreatedAt  time.Time `json:"-"`
-	ModifiedAt time.Time `json:"-"`
-	DeletedAt  time.Time `json:"-"`
 }
 
 func DisbandRoleById(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +21,7 @@ func DisbandRoleById(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode("Invalid id")
 		return
 	}
-	db.GetConnect().Where(Roles{Id: i}).Delete(&Roles{})
+	db.GetConnect().Where(Roles{}, i).Delete(&Roles{})
 	json.NewEncoder(w).Encode("role disband")
 }
 
@@ -45,15 +42,14 @@ func UpdateRoleById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	json.NewDecoder(r.Body).Decode(&nrole)
-	nrole.ModifiedAt = time.Now()
-	db.GetConnect().Where(&role, Roles{Id: i}).Update(nrole)
+	db.GetConnect().Where(&role, i).Update(nrole)
 	json.NewEncoder(w).Encode(role)
 }
 
 func GetRoleById(w http.ResponseWriter, r *http.Request) {
 	var role Roles
 	i, _ := strconv.Atoi(mux.Vars(r)["id"])
-	db.GetConnect().First(&role, Roles{Id: i})
+	db.GetConnect().First(&role, i)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(role)
 }
