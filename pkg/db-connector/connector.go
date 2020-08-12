@@ -6,6 +6,7 @@ import (
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"os"
 )
 
 var self IConnector
@@ -30,15 +31,19 @@ func (c *Connector) Connect() error {
 		return errors.New("db already connected")
 	}
 
-	if c.conf == nil {
-		return errors.New("db config is empty")
+	var dsn string
+	if os.Getenv("DATABASE_URL") != "" {
+		dsn = os.Getenv("DATABASE_URL")
+	} else {
+		if c.conf == nil {
+			return errors.New("db config is empty")
+		}
+		dsn = fmt.Sprintf(
+			"host=%s port=%d user=%s dbname=%s password=%s",
+			c.conf.Host, c.conf.Port, c.conf.User, c.conf.DBName, c.conf.Password,
+		)
 	}
-
-	dsn := fmt.Sprintf(
-		"host=%s port=%d user=%s dbname=%s password=%s",
-		c.conf.Host, c.conf.Port, c.conf.User, c.conf.DBName, c.conf.Password,
-	)
-
+	println(dsn)
 	db, err := gorm.Open("postgres", dsn)
 	if err != nil {
 		c.db = &gorm.DB{}
