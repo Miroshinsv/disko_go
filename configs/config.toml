@@ -1,0 +1,14 @@
+LOG_VERBOSE=true
+
+# Web Server
+WEB_SERVER_ENABLED=true
+WEB_HOST="localhost"
+WEB_PORT=8080
+
+# DB
+DB_ENABLED=false
+DB_HOST=""
+DB_USER=""
+DB_PORT=0
+DB_NAME=""
+DB_PASSWORD=""
