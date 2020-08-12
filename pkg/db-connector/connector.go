@@ -43,7 +43,7 @@ func (c *Connector) Connect() error {
 			c.conf.Host, c.conf.Port, c.conf.User, c.conf.DBName, c.conf.Password,
 		)
 	}
-	println(dsn)
+	println("Connect to db:" + dsn)
 	db, err := gorm.Open("postgres", dsn)
 	if err != nil {
 		c.db = &gorm.DB{}
