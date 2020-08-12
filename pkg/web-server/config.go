@@ -25,6 +25,7 @@ func (c Config) Validate() error {
 		}
 	}
 
+	println(os.Getenv("PORT"))
 	if c.Port == 0 {
 		if os.Getenv("PORT") != "" {
 			c.Port, _ = strconv.Atoi(os.Getenv("PORT"))
