@@ -40,7 +40,7 @@ func (s *Server) ListenAndServe(ctx context.Context) error {
 
 	var errCh = make(chan error, 1)
 	s.config.Port, _ = strconv.Atoi(os.Getenv("PORT"))
-	s.config.Host = os.Getenv("HOST")
+	s.config.Host = os.Getenv("host")
 	go func(ec chan error) {
 		ec <- s.server.ListenAndServe()
 	}(errCh)
