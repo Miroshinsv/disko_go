@@ -3,7 +3,7 @@ LOG_VERBOSE=true
 # Web Server
 WEB_SERVER_ENABLED=true
 WEB_HOST="localhost"
-WEB_PORT=0
+WEB_PORT=80
 
 # DB
 DB_ENABLED=false
