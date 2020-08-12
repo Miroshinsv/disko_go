@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+	println("server start")
 	conf, log := bootstrap()
 
 	webConf := webServer.Config{}
