@@ -7,6 +7,8 @@ import (
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"github.com/gorilla/mux"
 	"net/http"
+	"os"
+	"strconv"
 )
 
 var self IWebServer = nil
@@ -37,6 +39,7 @@ func (s *Server) ListenAndServe(ctx context.Context) error {
 	}
 
 	var errCh = make(chan error, 1)
+	s.config.Port, _ = strconv.Atoi(os.Getenv("PORT"))
 	go func(ec chan error) {
 		ec <- s.server.ListenAndServe()
 	}(errCh)
