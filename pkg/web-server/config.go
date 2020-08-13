@@ -3,7 +3,6 @@ package web_server
 import (
 	"errors"
 	"os"
-	"strconv"
 )
 
 type Config struct {
@@ -23,13 +22,6 @@ func (c Config) Validate() error {
 		} else {
 			return errors.New("WEB_HOST is not defined")
 		}
-	}
-	var err error
-	c.Port, err = strconv.Atoi(os.Getenv("PORT"))
-	println("###port####")
-	println(c.Port)
-	if err != nil {
-		return errors.New("env port not found")
 	}
 
 	if c.Port == 0 {
