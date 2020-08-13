@@ -2,7 +2,6 @@ package web_server
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
 )
@@ -25,10 +24,14 @@ func (c Config) Validate() error {
 			return errors.New("WEB_HOST is not defined")
 		}
 	}
+	var err error
+	c.Port, err = strconv.Atoi(os.Getenv("PORT"))
+	println("###port####")
+	println(c.Port)
+	if err != nil {
+		return errors.New("env port not found")
+	}
 
-	c.Port, _ = strconv.Atoi(os.Getenv("PORT"))
-	fmt.Println("Port: ")
-	fmt.Println(c.Port)
 	if c.Port == 0 {
 		return errors.New("WEB_PORT is not defined")
 	}
