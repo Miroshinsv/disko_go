@@ -14,6 +14,12 @@ type Handler struct {
 	conn dbConnector.IConnector
 }
 
+func (h Handler) Health(w http.ResponseWriter, r *http.Request) {
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": "ok",
+	})
+}
+
 func (h Handler) ActivateEventById(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
