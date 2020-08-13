@@ -4,6 +4,7 @@ import (
 	directionService "github.com/Miroshinsv/disko_go/internal/direction-service"
 	eventService "github.com/Miroshinsv/disko_go/internal/event-service"
 	roleService "github.com/Miroshinsv/disko_go/internal/role-service"
+	schedule_service "github.com/Miroshinsv/disko_go/internal/schedule-service"
 	schoolService "github.com/Miroshinsv/disko_go/internal/school-service"
 	userService "github.com/Miroshinsv/disko_go/internal/user-service"
 	"github.com/gorilla/mux"
@@ -12,9 +13,19 @@ import (
 
 var WebRouter *mux.Router
 
+func jsonMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func RegisterHandlers() {
 	WebRouter = mux.NewRouter()
 	WebRouter.StrictSlash(true)
+
+	WebRouter.Use(jsonMiddleware)
 
 	//Directions
 	hDirection := directionService.MustNewHandlerDirection()
@@ -55,6 +66,11 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/user/update/{id}/", hUsers.UpdateUserById).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/user/disband/{id}/", hUsers.DisbandUserById).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/user/add/", hUsers.AddUser).Methods(http.MethodPost)
+
+	//Schedule
+	hSchedule := schedule_service.MustNewHandlerSchedule()
+	WebRouter.HandleFunc("/schedule/today/", hSchedule.LoadEventsForToday).Methods(http.MethodGet)
+	WebRouter.HandleFunc("/schedule/period/", hSchedule.LoadEventsForPeriod).Methods(http.MethodGet)
 
 	//Health
 	WebRouter.HandleFunc("/events/health", hEvents.Health).Methods(http.MethodGet)

@@ -11,7 +11,7 @@ type base string
 type EventsType struct {
 	gorm.Model
 	EventsTypeName string
-	DayOfWeek      []int
+	DayOfWeek      int
 	IsRepeatable   bool
 }
 

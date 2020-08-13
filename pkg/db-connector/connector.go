@@ -52,7 +52,7 @@ func (c *Connector) Connect() error {
 		return err
 	}
 
-	c.db = db
+	c.db = db.Debug()
 	c.isConnected = true
 
 	return nil

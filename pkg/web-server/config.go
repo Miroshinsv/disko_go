@@ -2,7 +2,6 @@ package web_server
 
 import (
 	"errors"
-	"os"
 )
 
 type Config struct {
@@ -17,11 +16,7 @@ func (c Config) Validate() error {
 	}
 
 	if c.Host == "" {
-		if os.Getenv("HOST") != "" {
-			c.Host = os.Getenv("HOST")
-		} else {
-			return errors.New("WEB_HOST is not defined")
-		}
+		return errors.New("WEB_HOST is not defined")
 	}
 
 	if c.Port == 0 {
