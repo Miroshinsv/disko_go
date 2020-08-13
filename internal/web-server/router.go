@@ -55,4 +55,7 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/user/update/{id}/", hUsers.UpdateUserById).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/user/disband/{id}/", hUsers.DisbandUserById).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/user/add/", hUsers.AddUser).Methods(http.MethodPost)
+
+	//Health
+	WebRouter.HandleFunc("/events/health", hEvents.Health).Methods(http.MethodGet)
 }
