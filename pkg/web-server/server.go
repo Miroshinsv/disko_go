@@ -7,8 +7,6 @@ import (
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"github.com/gorilla/mux"
 	"net/http"
-	"os"
-	"strconv"
 )
 
 var self IWebServer = nil
@@ -30,7 +28,6 @@ func (s *Server) RegisterRoutes(router *mux.Router) {
 }
 
 func (s *Server) ListenAndServe(ctx context.Context) error {
-	s.config.Port, _ = strconv.Atoi(os.Getenv("PORT"))
 	if s.server == nil {
 		return errors.New("no routes defined for web-server")
 	}
