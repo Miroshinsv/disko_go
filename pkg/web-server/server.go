@@ -32,9 +32,7 @@ func (s *Server) RegisterRoutes(router *mux.Router) {
 func (s *Server) ListenAndServe(ctx context.Context) error {
 	var err error
 	s.config.Port, err = strconv.Atoi(os.Getenv("PORT"))
-	println("###port####")
-	println(s.config.Port)
-	println(err)
+	s.config.Host = ""
 	if err != nil {
 		return errors.New("env port not found")
 	}
