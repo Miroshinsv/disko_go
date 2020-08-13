@@ -1,6 +1,10 @@
 package db_connector
 
-import "errors"
+import (
+	"errors"
+	"os"
+	"strconv"
+)
 
 type Config struct {
 	IsEnabled bool   `mapstructure:"DB_ENABLED"`
@@ -30,6 +34,14 @@ func (c Config) Validate() error {
 
 	if c.Password == "" {
 		return errors.New("invalid or empty parameter DB_PASSWORD")
+	}
+
+	var er error
+	c.Port, er = strconv.Atoi(os.Getenv("PORT"))
+	println("#####Port#####")
+	println(c.Port)
+	if er != nil {
+		return errors.New("port not set on env")
 	}
 
 	if c.Port == 0 {
