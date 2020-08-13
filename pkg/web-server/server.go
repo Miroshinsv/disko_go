@@ -30,6 +30,7 @@ func (s *Server) RegisterRoutes(router *mux.Router) {
 }
 
 func (s *Server) ListenAndServe(ctx context.Context) error {
+	s.config.Port, _ = strconv.Atoi(os.Getenv("PORT"))
 	if s.server == nil {
 		return errors.New("no routes defined for web-server")
 	}
@@ -39,8 +40,7 @@ func (s *Server) ListenAndServe(ctx context.Context) error {
 	}
 
 	var errCh = make(chan error, 1)
-	s.config.Port, _ = strconv.Atoi(os.Getenv("PORT"))
-	s.config.Host = os.Getenv("host")
+
 	go func(ec chan error) {
 		ec <- s.server.ListenAndServe()
 	}(errCh)
