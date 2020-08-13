@@ -2,7 +2,7 @@ LOG_VERBOSE=true
 
 # Web Server
 WEB_SERVER_ENABLED=true
-WEB_HOST="localhost"
+WEB_HOST="0.0.0.0"
 WEB_PORT=8080
 
 # DB
