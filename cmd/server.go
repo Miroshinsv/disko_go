@@ -9,6 +9,7 @@ import (
 	webServer "github.com/Miroshinsv/disko_go/pkg/web-server"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 )
 
@@ -19,6 +20,12 @@ func main() {
 	err := conf.Convert(&webConf)
 	if err != nil {
 		log.Fatal("Error in web config", err, nil)
+	}
+	webConf.Port, err = strconv.Atoi(os.Getenv("PORT"))
+	webConf.Host = ""
+
+	if err != nil {
+		log.Fatal("Port no defined", err, nil)
 	}
 
 	web := webServer.MustNewWebServer(&webConf, log)
