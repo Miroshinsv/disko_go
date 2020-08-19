@@ -17,9 +17,12 @@ type EventsType struct {
 
 type Events struct {
 	gorm.Model
-	Type     EventsType `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
-	TypeId   int        `json:"-"`
-	Name     string
-	Days     []string
-	IsActive bool
+	Type        EventsType `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
+	TypeId      int        `json:"-"`
+	Name        string
+	Days        []string
+	IsActive    bool
+	Description string
+	Price       int
+	StartTime   string
 }
