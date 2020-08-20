@@ -7,22 +7,10 @@ import (
 	"strings"
 )
 
-const (
-	monday    base = "1"
-	thuesday  base = "2"
-	wednesday base = "3"
-	thursday  base = "4"
-	friday    base = "5"
-	saturday  base = "6"
-	sunday    base = "7"
-)
-
-type base string
-
 type EventsType struct {
 	gorm.Model
 	EventsTypeName string
-	DayOfWeek      []int
+	DayOfWeek      int
 	IsRepeatable   bool
 }
 
