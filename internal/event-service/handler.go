@@ -96,12 +96,6 @@ func (h Handler) UpdateEventById(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(event)
 }
 
-func (h Handler) Health(w http.ResponseWriter, r *http.Request) {
-	_ = json.NewEncoder(w).Encode(map[string]interface{}{
-		"status": "ok",
-	})
-}
-
 func MustNewHandlerEvent() *Handler {
 	db, _ := dbConnector.GetDBConnection()
 
