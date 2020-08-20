@@ -63,6 +63,7 @@ func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {
 	if err.Error != nil {
 		_ = json.NewEncoder(w).Encode("Can't add event")
 	} else {
+		h.conn.GetConnection().Preload("Type").Find(&event, event.ID)
 		_ = json.NewEncoder(w).Encode(event)
 	}
 }
@@ -87,6 +88,12 @@ func (h Handler) UpdateEventById(w http.ResponseWriter, r *http.Request) {
 	h.conn.GetConnection().Where(&event, i).Update(nEvent)
 
 	_ = json.NewEncoder(w).Encode(event)
+}
+
+func (h Handler) Health(w http.ResponseWriter, r *http.Request) {
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": "ok",
+	})
 }
 
 func MustNewHandlerEvent() *Handler {
