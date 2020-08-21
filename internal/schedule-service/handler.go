@@ -14,6 +14,16 @@ const (
 	timeFormat = "2006-01-02"
 )
 
+var names = [...]string{
+	"sunday",
+	"monday",
+	"tuesday",
+	"wednesday",
+	"thursday",
+	"friday",
+	"saturday",
+}
+
 type Handler struct {
 	log  loggerService.ILogger
 	conn dbConnector.IConnector
@@ -26,8 +36,8 @@ func (h Handler) LoadEventsForToday(w http.ResponseWriter, _ *http.Request) {
 		Find(
 			&events,
 			fmt.Sprintf(
-				"events.created_at <= NOW() AND events.is_active = true AND events_types.day_of_week = dayofweek('%d')",
-				time.Now().Weekday(),
+				"events.days = '{%s}' AND events.is_active = true",
+				names[time.Now().Weekday()],
 			),
 		)
 
@@ -87,12 +97,12 @@ func (h Handler) LoadEventsForPeriod(w http.ResponseWriter, r *http.Request) {
 func (h Handler) findEventsForDate(d time.Time, events []eventService.Events) []eventService.Events {
 	var res = make([]eventService.Events, 0)
 
-	weekDay := int(d.Weekday())
-	for _, v := range events {
-		if v.Type.DayOfWeek == weekDay {
-			res = append(res, v)
-		}
-	}
+	//weekDay := int(d.Weekday())
+	//for _, v := range events {
+	//	if v.Type.DayOfWeek == weekDay {
+	//		res = append(res, v)
+	//	}
+	//}
 
 	return res
 }
