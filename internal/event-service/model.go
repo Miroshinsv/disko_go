@@ -16,7 +16,7 @@ type Events struct {
 	Type        EventsType `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
 	TypeId      int        `json:"type_id"`
 	Name        string     `json:"name"`
-	Days        []string   `json:"days"`
+	Days        string     `json:"days"`
 	IsActive    bool       `json:"is_active"`
 	Description string     `json:"description"`
 	Price       int        `json:"price"`
@@ -25,13 +25,13 @@ type Events struct {
 
 func (d *Events) UnmarshalJSON(data []byte) error {
 	type income struct {
-		TypeId      int      `json:"type_id"`
-		Name        string   `json:"name"`
-		Days        []string `json:"days"`
-		IsActive    bool     `json:"is_active"`
-		Description string   `json:"description"`
-		Price       int      `json:"price"`
-		StartTime   string   `json:"start_time"`
+		TypeId      int    `json:"type_id"`
+		Name        string `json:"name"`
+		Days        string `json:"days"`
+		IsActive    bool   `json:"is_active"`
+		Description string `json:"description"`
+		Price       int    `json:"price"`
+		StartTime   string `json:"start_time"`
 	}
 
 	var inc income
@@ -56,7 +56,7 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		gorm.Model
 		Type        EventsType `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
 		Name        string     `json:"name"`
-		Days        []string   `json:"days"`
+		Days        string     `json:"days"`
 		IsActive    bool       `json:"is_active"`
 		Description string     `json:"description"`
 		Price       int        `json:"price"`
