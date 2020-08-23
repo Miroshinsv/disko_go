@@ -1,0 +1,699 @@
+swagger: "2.0"
+info:
+  description: "Disko description"
+  version: "0.0.1a"
+  title: "Swagger For Disko"
+  contact:
+    email: "burn@hell.com"
+host: "mighty-beach-02870.herokuapp.com"
+basePath: "/"
+tags:
+  - name: "directions"
+    description: "Everything about school's diretions"
+  - name: "events"
+    description: "Everything about school's events"
+  - name: "roles"
+    description: "Everything about user's roles"
+  - name: "schools"
+    description: "Everything about schools"
+  - name: "users"
+    description: "Everything about users"
+  - name: "schedule"
+    description: "School's events"
+  - name: "utils"
+    description: "Work tools"
+schemes:
+  - "http"
+paths:
+  /directions/get/all:
+    get:
+      tags:
+        - "directions"
+      summary: "Get list of directions"
+      operationId: "directionsGetAll"
+      consumes:
+        - "application/json"
+      responses:
+        '200':
+          $ref: '#/definitions/ArrayOfDirections'
+  /directions/add:
+    post:
+      tags:
+        - "directions"
+      summary: "Add new direction"
+      operationId: "directionsAdd"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/Direction"
+      responses:
+        "200":
+          $ref: "#/definitions/Direction"
+  /directions/get/{id}:
+    get:
+      tags:
+        - "directions"
+      parameters:
+        - name: id
+          in: path
+          description: Direction ID
+          required: true
+          type: integer
+          format: int64
+      summary: "Get directio by id"
+      operationId: "directionsGetById"
+      responses:
+        "200":
+          $ref: "#/definitions/Direction"
+  /directions/update/{id}:
+    post:
+      tags:
+        - "directions"
+      parameters:
+        - name: id
+          in: path
+          description: Direction ID
+          required: true
+          type: integer
+          format: int64
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/Direction"
+      summary: "Update direction"
+      operationId: "directionsUpdateById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          $ref: "#/definitions/Direction"
+  /directions/disband/{id}:
+    post:
+      tags:
+        - "directions"
+      parameters:
+        - name: id
+          in: path
+          description: Direction ID
+          required: true
+          type: integer
+          format: int64
+      summary: "Disband direction"
+      operationId: "directionsDisbandById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          $ref: "#/definitions/Direction"
+
+  /events/get/all:
+    get:
+      tags:
+        - "events"
+      summary: "Get list of events"
+      operationId: "eventsGetAll"
+      consumes:
+        - "application/json"
+      responses:
+        '200':
+          $ref: '#/definitions/ArrayOfEvents'
+  /events/add:
+    post:
+      tags:
+        - "events"
+      summary: "Add new events"
+      operationId: "eventsAdd"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/Event"
+      responses:
+        "200":
+          $ref: "#/definitions/Event"
+  /events/get/{id}:
+    get:
+      tags:
+        - "events"
+      parameters:
+        - name: id
+          in: path
+          description: Event ID
+          required: true
+          type: integer
+          format: int64
+      summary: "Get event by id"
+      operationId: "eventsGetById"
+      responses:
+        "200":
+          $ref: "#/definitions/Event"
+  /events/update/{id}:
+    post:
+      tags:
+        - "events"
+      parameters:
+        - name: id
+          in: path
+          description: Event ID
+          required: true
+          type: integer
+          format: int64
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/Event"
+      summary: "Update event"
+      operationId: "eventsUpdateById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          $ref: "#/definitions/Event"
+  /events/activate/{id}:
+    post:
+      tags:
+        - "events"
+      parameters:
+        - name: id
+          in: path
+          description: Event ID
+          required: true
+          type: integer
+          format: int64
+      summary: "Activate event"
+      operationId: "eventsActivateById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          $ref: "#/definitions/Event"
+
+  /roles/get/all:
+    get:
+      tags:
+        - "roles"
+      summary: "Get list of roles"
+      operationId: "rolesGetAll"
+      consumes:
+        - "application/json"
+      responses:
+        '200':
+          $ref: '#/definitions/ArrayOfRoles'
+  /roles/add:
+    post:
+      tags:
+        - "roles"
+      summary: "Add new role"
+      operationId: "rolesAdd"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/Role"
+      responses:
+        "200":
+          $ref: "#/definitions/Role"
+  /roles/get/{id}:
+    get:
+      tags:
+        - "directions"
+      parameters:
+        - name: id
+          in: path
+          description: Role ID
+          required: true
+          type: integer
+          format: int64
+      summary: "Get role by id"
+      operationId: "rolesGetById"
+      responses:
+        "200":
+          $ref: "#/definitions/Role"
+  /roles/update/{id}:
+    post:
+      tags:
+        - "roles"
+      parameters:
+        - name: id
+          in: path
+          description: Role ID
+          required: true
+          type: integer
+          format: int64
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/Role"
+      summary: "Update role"
+      operationId: "rolsUpdateById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          $ref: "#/definitions/Role"
+  /roles/disband/{id}:
+    post:
+      tags:
+        - "roles"
+      parameters:
+        - name: id
+          in: path
+          description: Role ID
+          required: true
+          type: integer
+          format: int64
+      summary: "Disband role"
+      operationId: "rolesDisbandById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          $ref: "#/definitions/Role"
+
+  /schools/get/all:
+    get:
+      tags:
+        - "schools"
+      summary: "Get list of schools"
+      operationId: "schoolsGetAll"
+      consumes:
+        - "application/json"
+      responses:
+        '200':
+          $ref: '#/definitions/ArrayOfSchools'
+  /schools/add:
+    post:
+      tags:
+        - "schools"
+      summary: "Add new school"
+      operationId: "schoolsAdd"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/School"
+      responses:
+        "200":
+          $ref: "#/definitions/School"
+  /schools/get/{id}:
+    get:
+      tags:
+        - "schools"
+      parameters:
+        - name: id
+          in: path
+          description: School ID
+          required: true
+          type: integer
+          format: int64
+      summary: "Get school by id"
+      operationId: "schoolsGetById"
+      responses:
+        "200":
+          $ref: "#/definitions/School"
+  /schools/update/{id}:
+    post:
+      tags:
+        - "schools"
+      parameters:
+        - name: id
+          in: path
+          description: School ID
+          required: true
+          type: integer
+          format: int64
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/School"
+      summary: "Update school"
+      operationId: "schoolsUpdateById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          $ref: "#/definitions/School"
+  /schools/delete/{id}:
+    post:
+      tags:
+        - "schools"
+      parameters:
+        - name: id
+          in: path
+          description: School ID
+          required: true
+          type: integer
+          format: int64
+      summary: "Delete School"
+      operationId: "schoolsDisbandById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          $ref: "#/definitions/School"
+
+  /users/get/all:
+    get:
+      tags:
+        - "users"
+      summary: "Get list of users"
+      operationId: "usersGetAll"
+      consumes:
+        - "application/json"
+      responses:
+        '200':
+          $ref: '#/definitions/ArrayOfUsers'
+  /users/add:
+    post:
+      tags:
+        - "users"
+      summary: "Add new user"
+      operationId: "usersAdd"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/User"
+      responses:
+        "200":
+          $ref: "#/definitions/User"
+  /users/get/{id}:
+    get:
+      tags:
+        - "users"
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+          format: int64
+      summary: "Get user by id"
+      operationId: "usersGetById"
+      responses:
+        "200":
+          $ref: "#/definitions/User"
+  /users/update/{id}:
+    post:
+      tags:
+        - "users"
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+          format: int64
+        - in: "body"
+          name: "body"
+          schema:
+            $ref: "#/definitions/User"
+      summary: "Update role"
+      operationId: "usersUpdateById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          $ref: "#/definitions/User"
+  /user/disband/{id}:
+    post:
+      tags:
+        - "users"
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          type: integer
+          format: int64
+      summary: "Disband user"
+      operationId: "usersDisbandById"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          $ref: "#/definitions/User"
+
+  /schedule/today:
+    get:
+      tags:
+        - "schedule"
+      summary: "Get list of events for today"
+      operationId: "scheduleToday"
+      consumes:
+        - "application/json"
+      responses:
+        '200':
+          $ref: '#/definitions/ArrayOfEvents'
+  /schedule/period:
+    get:
+      tags:
+        - "schedule"
+      parameters:
+        - name: from
+          in: query
+          description: Date from
+          required: true
+          type: string
+          format: date-time
+        - name: to
+          in: query
+          description: Date to
+          required: true
+          type: string
+          format: date-time
+      summary: "Get list of events for period"
+      operationId: "scheduleForPeriod"
+      responses:
+        '200':
+          $ref: '#/definitions/ArrayOfEvents'
+
+  /events/health:
+    get:
+      tags:
+        - "utils"
+      operationId: "utilsHealth"
+      responses:
+        "200":
+          description: "Ok or Not"
+
+definitions:
+  Direction:
+    type: "object"
+    properties:
+      ID:
+        type: "integer"
+        format: "int64"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+      deleted_at:
+        type: "string"
+        format: "date-time"
+      name:
+        type: "string"
+        description: "Name of direction"
+      is_single:
+        type: "boolean"
+        default: false
+    xml:
+      name: "Direction"
+  Role:
+    type: "object"
+    properties:
+      ID:
+        type: "integer"
+        format: "int64"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+      deleted_at:
+        type: "string"
+        format: "date-time"
+      name:
+        type: "string"
+    xml:
+      name: "Role"
+  User:
+    type: "object"
+    properties:
+      ID:
+        type: "integer"
+        format: "int64"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+      deleted_at:
+        type: "string"
+        format: "date-time"
+      first_name:
+        type: "string"
+      shure_name:
+        type: "string"
+      middle_name:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+      phone:
+        type: "string"
+    xml:
+      name: "User"
+  School:
+    type: "object"
+    properties:
+      ID:
+        type: "integer"
+        format: "int64"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+      deleted_at:
+        type: "string"
+        format: "date-time"
+      school_name:
+        type: "string"
+      description:
+        type: "string"
+      phone:
+        type: "string"
+      site:
+        type: "string"
+      email:
+        type: "string"
+      owner_id:
+        type: "integer"
+        format: "int64"
+      owner:
+        $ref: "#/definitions/User"
+    xml:
+      name: "School"
+  EventsType:
+    type: "object"
+    properties:
+      ID:
+        type: "integer"
+        format: "int64"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+      deleted_at:
+        type: "string"
+        format: "date-time"
+      events_type_name:
+        type: "string"
+      is_repeatable:
+        type: "boolean"
+    xml:
+      name: "EventsType"
+  Event:
+    type: "object"
+    properties:
+      ID:
+        type: "integer"
+        format: "int64"
+      created_at:
+        type: "string"
+        format: "date-time"
+      updated_at:
+        type: "string"
+        format: "date-time"
+      deleted_at:
+        type: "string"
+        format: "date-time"
+      type:
+        $ref: "#/definitions/EventsType"
+      type_id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      days:
+        type: "string"
+      is_active:
+        type: "boolean"
+      description:
+        type: "string"
+      price:
+        type: "integer"
+      start_time:
+        type: "string"
+      logo:
+        type: "string"
+  ArrayOfDirections:
+    type: "array"
+    items:
+      $ref: "#/definitions/Direction"
+  ArrayOfEvents:
+    type: "array"
+    items:
+      $ref: "#/definitions/Event"
+  ArrayOfRoles:
+    type: "array"
+    items:
+      $ref: "#/definitions/Role"
+  ArrayOfSchools:
+    type: "array"
+    items:
+      $ref: "#/definitions/School"
+  ArrayOfUsers:
+    type: "array"
+    items:
+      $ref: "#/definitions/User"
