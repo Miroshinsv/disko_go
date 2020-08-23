@@ -62,8 +62,14 @@ func (h Handler) GetAllEvents(w http.ResponseWriter, _ *http.Request) {
 
 func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {
 	var event Events
-	// @todo: cover error
-	_ = json.NewDecoder(r.Body).Decode(&event)
+
+	rErr := json.NewDecoder(r.Body).Decode(&event)
+	if rErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode("Invalid event: " + rErr.Error())
+
+		return
+	}
 
 	err := h.conn.GetConnection().Save(&event)
 	if err.Error != nil {

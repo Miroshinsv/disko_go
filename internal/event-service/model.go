@@ -2,8 +2,13 @@ package event_service
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/jinzhu/gorm"
+	"regexp"
+	"strings"
 )
+
+var regReplace = regexp.MustCompile("[{}\"]")
 
 type EventsType struct {
 	gorm.Model
@@ -45,7 +50,10 @@ func (d *Events) UnmarshalJSON(data []byte) error {
 	d.Name = inc.Name
 	d.TypeId = inc.TypeId
 	d.IsActive = inc.IsActive
-	d.Days = inc.Days
+
+	daysSlice := strings.Split(inc.Days, ",")
+	d.Days = fmt.Sprintf("{\"%s\"}", strings.Join(daysSlice, "\",\""))
+
 	d.StartTime = inc.StartTime
 	d.Price = inc.Price
 	d.Description = inc.Description
@@ -71,7 +79,7 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		Name:        d.Name,
 		IsActive:    d.IsActive,
 		Type:        d.Type,
-		Days:        d.Days,
+		Days:        regReplace.ReplaceAllString(d.Days, ""),
 		Description: d.Description,
 		Price:       d.Price,
 		StartTime:   d.StartTime,

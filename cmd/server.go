@@ -21,8 +21,11 @@ func main() {
 	if err != nil {
 		log.Fatal("Error in web config", err, nil)
 	}
-	webConf.Port, err = strconv.Atoi(os.Getenv("PORT"))
-	webConf.Host = ""
+
+	if os.Getenv("PORT") != "" {
+		webConf.Port, err = strconv.Atoi(os.Getenv("PORT"))
+		webConf.Host = ""
+	}
 
 	if err != nil {
 		log.Fatal("Port no defined", err, nil)
