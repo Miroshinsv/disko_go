@@ -27,18 +27,22 @@ type Events struct {
 	Price       int        `json:"price"`
 	StartTime   string     `json:"start_time"`
 	Logo        string     `json:"logo"`
+	Lat         float32    `json:"lat"`
+	Lng         float32    `json:"lng"`
 }
 
 func (d *Events) UnmarshalJSON(data []byte) error {
 	type income struct {
-		TypeId      int    `json:"type_id"`
-		Name        string `json:"name"`
-		Days        string `json:"days"`
-		IsActive    bool   `json:"is_active"`
-		Description string `json:"description"`
-		Price       int    `json:"price"`
-		StartTime   string `json:"start_time"`
-		Logo        string `json:"logo"`
+		TypeId      int     `json:"type_id"`
+		Name        string  `json:"name"`
+		Days        string  `json:"days"`
+		IsActive    bool    `json:"is_active"`
+		Description string  `json:"description"`
+		Price       int     `json:"price"`
+		StartTime   string  `json:"start_time"`
+		Logo        string  `json:"logo"`
+		Lat         float32 `json:"lat"`
+		Lng         float32 `json:"lng"`
 	}
 
 	var inc income
@@ -58,6 +62,8 @@ func (d *Events) UnmarshalJSON(data []byte) error {
 	d.Price = inc.Price
 	d.Description = inc.Description
 	d.Logo = inc.Logo
+	d.Lat = inc.Lat
+	d.Lng = inc.Lng
 	return nil
 }
 
@@ -72,6 +78,8 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		Price       int        `json:"price"`
 		StartTime   string     `json:"start_time"`
 		Logo        string     `json:"logo"`
+		Lat         float32    `json:"lat"`
+		Lng         float32    `json:"lng"`
 	}
 
 	var out = outcome{
@@ -84,6 +92,8 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		Price:       d.Price,
 		StartTime:   d.StartTime,
 		Logo:        d.Logo,
+		Lat:         d.Lat,
+		Lng:         d.Lng,
 	}
 
 	return json.Marshal(out)
