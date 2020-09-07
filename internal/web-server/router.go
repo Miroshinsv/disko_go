@@ -1,12 +1,16 @@
 package web_server
 
 import (
+	auth_service "github.com/Miroshinsv/disko_go/internal/auth-service"
 	directionService "github.com/Miroshinsv/disko_go/internal/direction-service"
 	eventService "github.com/Miroshinsv/disko_go/internal/event-service"
+	poll_service "github.com/Miroshinsv/disko_go/internal/poll-service"
 	roleService "github.com/Miroshinsv/disko_go/internal/role-service"
 	schedule_service "github.com/Miroshinsv/disko_go/internal/schedule-service"
 	schoolService "github.com/Miroshinsv/disko_go/internal/school-service"
 	userService "github.com/Miroshinsv/disko_go/internal/user-service"
+	"github.com/Miroshinsv/disko_go/internal/web-server/middleware"
+
 	"github.com/gorilla/mux"
 	"net/http"
 )
@@ -26,6 +30,7 @@ func RegisterHandlers() {
 	WebRouter.StrictSlash(true)
 
 	WebRouter.Use(jsonMiddleware)
+	WebRouter.Use(middleware.AuthMiddleware)
 
 	//Directions
 	hDirection := directionService.MustNewHandlerDirection()
@@ -72,6 +77,20 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/schedule/today/", hSchedule.LoadEventsForToday).Methods(http.MethodGet)
 	WebRouter.HandleFunc("/schedule/period/", hSchedule.LoadEventsForPeriod).Methods(http.MethodGet)
 
+	//Auth
+	hAuth := auth_service.MustNewHandlerAuth()
+	WebRouter.HandleFunc("/auth/register/", hAuth.Register).Methods(http.MethodPost)
+	WebRouter.HandleFunc("/auth/login/", hAuth.Login).Methods(http.MethodPost)
+	WebRouter.HandleFunc("/auth/refresh/", hAuth.UpdateTokens).Methods(http.MethodGet)
+
+	//Poll
+	hPoll := poll_service.MustNewHandlerPoll()
+	WebRouter.HandleFunc("/poll/add/", hPoll.Create).Methods(http.MethodPost)
+	WebRouter.HandleFunc("/poll/update/{id}/", hPoll.Update).Methods(http.MethodPost)
+	WebRouter.HandleFunc("/poll/vote/{id}/", hPoll.Vote).Methods(http.MethodGet).Name("protected_poll_vote")
+	WebRouter.HandleFunc("/poll/view/{id}/", hPoll.View).Methods(http.MethodGet).Name("protected_poll_view")
+
 	//Health
 	WebRouter.HandleFunc("/events/health", hEvents.Health).Methods(http.MethodGet)
+	WebRouter.HandleFunc("/events/health_protected/", hEvents.Health).Methods(http.MethodGet).Name("protected_health")
 }

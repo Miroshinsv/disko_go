@@ -3,10 +3,12 @@ package db_connector
 import (
 	"errors"
 	"fmt"
-	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
+	"os"
+
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"os"
+
+	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 )
 
 var self IConnector

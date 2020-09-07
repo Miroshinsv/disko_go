@@ -73,7 +73,7 @@ func (h Handler) GetUserById(w http.ResponseWriter, r *http.Request) {
 	//@todo: cover error
 	i, _ := strconv.Atoi(mux.Vars(r)["id"])
 
-	h.conn.GetConnection().First(&user, i)
+	h.conn.GetConnection().Preload("Roles").First(&user, i)
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(user)
@@ -81,7 +81,7 @@ func (h Handler) GetUserById(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	var users []Users
-	h.conn.GetConnection().Find(&users)
+	h.conn.GetConnection().Preload("Roles").Find(&users)
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(users)
