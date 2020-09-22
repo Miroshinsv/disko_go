@@ -36,7 +36,7 @@ func (s Service) Create(p models.Income) (*models.Poll, error) {
 	)
 
 	s.conn.GetConnection().Where(
-		fmt.Sprintf("name LIKE '%s' AND event_id=%d", p.Name, p.EventId),
+		fmt.Sprintf("event_id=%d", p.EventId),
 	).Find(existing)
 	if existing.ID != 0 {
 		return &models.Poll{}, errorExistingPoll
@@ -49,8 +49,6 @@ func (s Service) Create(p models.Income) (*models.Poll, error) {
 
 	dbPoll := &models.Poll{
 		Model:    gorm.Model{},
-		Name:     p.Name,
-		Subject:  p.Subject,
 		EventId:  int(event.ID),
 		IsHidden: p.IsHidden,
 		DueDate:  time.Unix(p.DueDate, 0),
