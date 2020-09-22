@@ -19,6 +19,7 @@ var WebRouter *mux.Router
 
 func jsonMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Content-Type", "application/json")
 
 		next.ServeHTTP(w, r)
@@ -85,6 +86,7 @@ func RegisterHandlers() {
 
 	//Poll
 	hPoll := poll_service.MustNewHandlerPoll()
+	WebRouter.HandleFunc("/poll/generate/today", hPoll.GenerateToday).Methods(http.MethodGet)
 	WebRouter.HandleFunc("/poll/add/", hPoll.Create).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/poll/update/{id}/", hPoll.Update).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/poll/vote/{id}/", hPoll.Vote).Methods(http.MethodGet).Name("protected_poll_vote")
