@@ -44,7 +44,7 @@ func (h Handler) GetEventById(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	var events Events
 	h.conn.GetConnection().Preload("Type").Find(&events, i)
 
