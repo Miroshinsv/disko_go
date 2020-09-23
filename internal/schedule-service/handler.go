@@ -29,6 +29,19 @@ type Handler struct {
 	conn dbConnector.IConnector
 }
 
+func (h Handler) LoadAllEvents(w http.ResponseWriter, _ *http.Request) {
+	var events []eventService.Events
+	h.conn.GetConnection().Preload("Type").
+		Joins("LEFT JOIN events_types ON events.type_id = events_types.id").
+		Find(
+			&events,
+			fmt.Sprintf("events.is_active = true"),
+		)
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(events)
+}
+
 func (h Handler) LoadEventsForToday(w http.ResponseWriter, _ *http.Request) {
 	var events []eventService.Events
 	h.conn.GetConnection().Preload("Type").

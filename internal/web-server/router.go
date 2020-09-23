@@ -76,6 +76,7 @@ func RegisterHandlers() {
 	//Schedule
 	hSchedule := schedule_service.MustNewHandlerSchedule()
 	WebRouter.HandleFunc("/schedule/today/", hSchedule.LoadEventsForToday).Methods(http.MethodGet)
+	WebRouter.HandleFunc("/schedule/all/", hSchedule.LoadAllEvents).Methods(http.MethodGet)
 	WebRouter.HandleFunc("/schedule/period/", hSchedule.LoadEventsForPeriod).Methods(http.MethodGet)
 
 	//Auth
