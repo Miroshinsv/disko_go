@@ -1,0 +1,14 @@
+LOG_VERBOSE=true
+
+# Web Server
+WEB_SERVER_ENABLED=true
+WEB_HOST="localhost"
+WEB_PORT=8081
+
+# DB
+DB_ENABLED=true
+DB_HOST="ec2-107-20-15-85.compute-1.amazonaws.com"
+DB_USER="wkfbpsznhwjzdl"
+DB_PORT=5432
+DB_NAME="der0jl2atd0f3j"
+DB_PASSWORD="1bd72584b189d9431a39b54742db5205aa148e44ec836edaa4f0310323198034"
