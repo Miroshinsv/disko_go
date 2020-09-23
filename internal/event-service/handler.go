@@ -2,6 +2,7 @@ package event_service
 
 import (
 	"encoding/json"
+	"fmt"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"github.com/gorilla/mux"
@@ -30,7 +31,23 @@ func (h Handler) DeactivateEventById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var events Events
-	h.conn.GetConnection().Preload("Type").Find(&events, i).Update(Events{IsActive: false})
+	res := h.conn.GetConnection().Preload("Type").Find(&events, i)
+	if res.Error != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Print(res.Error.Error())
+
+		return
+	}
+
+	h.conn.GetConnection().Model(&events).Updates(map[string]interface{}{
+		"is_active": false,
+	})
+	if res.Error != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Print(res.Error.Error())
+
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(events)
@@ -46,7 +63,7 @@ func (h Handler) ActivateEventById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var events Events
-	h.conn.GetConnection().Preload("Type").Find(&events, i).Update(Events{IsActive: true})
+	h.conn.GetConnection().Preload("Type").Find(&events, i).Updates(Events{IsActive: true})
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(events)
@@ -113,7 +130,7 @@ func (h Handler) UpdateEventById(w http.ResponseWriter, r *http.Request) {
 	//@todo: cover error
 	_ = json.NewDecoder(r.Body).Decode(&nEvent)
 
-	h.conn.GetConnection().Where(&event, i).Update(nEvent)
+	h.conn.GetConnection().Where(&event, i).Updates(nEvent)
 
 	_ = json.NewEncoder(w).Encode(event)
 }
