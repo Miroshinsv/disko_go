@@ -20,6 +20,22 @@ func (h Handler) Health(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (h Handler) DeactivateEventById(w http.ResponseWriter, r *http.Request) {
+	i, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode("Invalid id")
+
+		return
+	}
+
+	var events Events
+	h.conn.GetConnection().Preload("Type").Find(&events, i).Update(Events{IsActive: false})
+
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(events)
+}
+
 func (h Handler) ActivateEventById(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {

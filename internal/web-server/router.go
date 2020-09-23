@@ -47,6 +47,7 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/events/add/", hEvents.AddEvent).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/events/update/{id}/", hEvents.UpdateEventById).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/events/activate/{id}/", hEvents.ActivateEventById).Methods(http.MethodPost)
+	WebRouter.HandleFunc("/events/deactivate/{id}/", hEvents.DeactivateEventById).Methods(http.MethodPost)
 
 	//Roles
 	hRoles := roleService.MustNewHandlerRole()
