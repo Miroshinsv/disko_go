@@ -24,7 +24,7 @@ type Events struct {
 	Days        string     `json:"days"`
 	IsActive    bool       `json:"is_active"`
 	Description string     `json:"description"`
-	Price       int        `json:"price"`
+	Price       string     `json:"price"`
 	StartTime   string     `json:"start_time"`
 	Logo        string     `json:"logo"`
 	Lat         float32    `json:"lat"`
@@ -38,7 +38,7 @@ func (d *Events) UnmarshalJSON(data []byte) error {
 		Days        string  `json:"days"`
 		IsActive    bool    `json:"is_active"`
 		Description string  `json:"description"`
-		Price       int     `json:"price"`
+		Price       string  `json:"price"`
 		StartTime   string  `json:"start_time"`
 		Logo        string  `json:"logo"`
 		Lat         float32 `json:"lat"`
@@ -75,7 +75,7 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		Days        string     `json:"days"`
 		IsActive    bool       `json:"is_active"`
 		Description string     `json:"description"`
-		Price       int        `json:"price"`
+		Price       string     `json:"price"`
 		StartTime   string     `json:"start_time"`
 		Logo        string     `json:"logo"`
 		Lat         float32    `json:"lat"`
