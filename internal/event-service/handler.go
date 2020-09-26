@@ -130,8 +130,7 @@ func (h Handler) UpdateEventById(w http.ResponseWriter, r *http.Request) {
 	//@todo: cover error
 	_ = json.NewDecoder(r.Body).Decode(&nEvent)
 
-	h.conn.GetConnection().Where(&event, i).Updates(nEvent)
-
+	h.conn.GetConnection().Find(&event, i).Updates(nEvent)
 	_ = json.NewEncoder(w).Encode(event)
 }
 
