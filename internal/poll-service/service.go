@@ -14,6 +14,10 @@ import (
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 )
 
+const (
+	timeFormat = "2006-01-02"
+)
+
 var (
 	self *Service = nil
 
@@ -102,6 +106,48 @@ func (s Service) ShowResults(poll *models.Poll, user *userService.Users) (map[in
 	}
 
 	return result, nil
+}
+
+func (s Service) ScheduleAutoPolls(events []event_service.Events, dt time.Time) error {
+	var (
+		eventIds = make([]uint, 0)
+		plEIds   = make(map[int]models.Poll, 0)
+		polls    []models.Poll
+		ds       = dt.Format(timeFormat)
+	)
+
+	for _, v := range events {
+		eventIds = append(eventIds, v.ID)
+	}
+
+	s.conn.GetConnection().
+		Where("event_id IN (?)", eventIds).
+		Where("TO_CHAR(due_date, 'YYYY-MM-DD') = ?", ds).
+		Find(&polls)
+
+	for _, v := range polls {
+		plEIds[v.EventId] = v
+	}
+
+	for _, i := range eventIds {
+		if _, isExists := plEIds[int(i)]; isExists {
+			continue
+		}
+
+		dbPoll := &models.Poll{
+			Model:    gorm.Model{},
+			EventId:  int(i),
+			IsHidden: true,
+			DueDate:  dt,
+		}
+
+		db := s.conn.GetConnection().Create(&dbPoll)
+		if db.Error != nil {
+			return db.Error
+		}
+	}
+
+	return nil
 }
 
 func (s Service) isVoiceValid(voice int) bool {

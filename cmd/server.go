@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	poll_service "github.com/Miroshinsv/disko_go/internal/poll-service"
+	schedule_service "github.com/Miroshinsv/disko_go/internal/schedule-service"
 	web_server "github.com/Miroshinsv/disko_go/internal/web-server"
 	configService "github.com/Miroshinsv/disko_go/pkg/config-service"
 	db_connector "github.com/Miroshinsv/disko_go/pkg/db-connector"
@@ -11,6 +13,7 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -41,6 +44,7 @@ func main() {
 		}
 	}()
 
+	registerAutoPolls(log)
 	registerShutdown(context.Background(), log, web)
 }
 
@@ -90,4 +94,39 @@ func registerShutdown(ctx context.Context, log loggerService.ILogger, web webSer
 			return
 		}
 	}
+}
+
+func registerAutoPolls(log loggerService.ILogger) {
+	ticker := time.NewTicker(5 * time.Minute) //@todo: move to env
+	go func() {
+		n := time.Now()
+		tm := time.Now().Add(24 * time.Hour)
+
+		for {
+			select {
+			case <-ticker.C:
+				events, err := schedule_service.GetScheduleService().LoadEventsForPeriod(n, tm)
+				if err != nil {
+					log.Error("error on scheduling polls", err, nil)
+
+					return
+				}
+
+				pS := poll_service.GetPollService()
+				err = pS.ScheduleAutoPolls(events[n.Format("2006-01-02")], n)
+				if err != nil {
+					log.Error("error on scheduling polls", err, nil)
+
+					return
+				}
+
+				err = pS.ScheduleAutoPolls(events[tm.Format("2006-01-02")], tm)
+				if err != nil {
+					log.Error("error on scheduling polls", err, nil)
+
+					return
+				}
+			}
+		}
+	}()
 }
