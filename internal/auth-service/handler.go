@@ -8,6 +8,7 @@ import (
 	"regexp"
 
 	"github.com/Miroshinsv/disko_go/internal/auth-service/models"
+	config_service "github.com/Miroshinsv/disko_go/pkg/config-service"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 )
@@ -108,13 +109,38 @@ func (h Handler) UpdateTokens(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(res)
 }
 
+func (h Handler) SocialAuth(w http.ResponseWriter, r *http.Request) {
+	// получаем код от API VK из квери стринга
+	authCode := r.URL.Query()["code"]
+	if authCode[0] == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"error": "invalid code",
+		})
+	}
+
+	user, err := h.service.LoginSocial(authCode[0])
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode(map[string]string{
+			"error": err.Error(),
+		})
+	}
+
+	_ = json.NewEncoder(w).Encode(map[string]string{
+		"auth":    h.service.GenerateAuthJWT(user),
+		"refresh": h.service.GenerateRefreshJWT(user),
+	})
+}
+
 func MustNewHandlerAuth() *Handler {
 	db, _ := dbConnector.GetDBConnection()
 	log := loggerService.GetLogger()
+	conf := config_service.GetConfigService()
 
 	return &Handler{
 		log:     log,
 		conn:    db,
-		service: MustNewAuthService(log, db),
+		service: MustNewAuthService(log, conf, db),
 	}
 }
