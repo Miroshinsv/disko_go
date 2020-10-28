@@ -3,6 +3,7 @@ package auth_service
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -111,6 +112,9 @@ func (h Handler) UpdateTokens(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) SocialAuth(w http.ResponseWriter, r *http.Request) {
 	// получаем код от API VK из квери стринга
+	fmt.Println("#####")
+	fmt.Println(r.URL.Query())
+	fmt.Println("#####")
 	authCode := r.URL.Query()["code"]
 	if authCode[0] == "" {
 		w.WriteHeader(http.StatusBadRequest)
