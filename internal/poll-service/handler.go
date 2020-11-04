@@ -113,13 +113,17 @@ func (h Handler) Vote(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	if len(mux.Vars(r)["id"]) == 0 {
+
+	if len(r.URL.Query()["vote"]) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
+
 		return
 	}
-	vote, err := strconv.Atoi(mux.Vars(r)["id"])
+
+	vote, err := strconv.Atoi(r.URL.Query()["vote"][0])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+
 		return
 	}
 
@@ -134,12 +138,12 @@ func (h Handler) Vote(w http.ResponseWriter, r *http.Request) {
 
 	err = h.service.Vote(vote, poll, r.Context().Value("user").(*userService.Users))
 	if err != nil {
-		fmt.Println(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(err)
 
 		return
 	}
+
 	_ = json.NewEncoder(w).Encode("ok")
 }
 
