@@ -205,7 +205,7 @@ func (h Service) LoginSocial(token string) (*userService.Users, error) {
 	}
 
 	var vkResp models.VKResponse
-	fmt.Printf("VK RESPONSE: %T", vkResp)
+	fmt.Printf("VK RESPONSE ID: %T", vkResp.Response.ID)
 	err = json.Unmarshal(body, &vkResp)
 	if err != nil {
 		return (*userService.Users)(nil), err
