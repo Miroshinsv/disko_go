@@ -84,7 +84,7 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/auth/register/", hAuth.Register).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/auth/login/", hAuth.Login).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/auth/refresh/", hAuth.UpdateTokens).Methods(http.MethodGet)
-	WebRouter.HandleFunc("/auth/vk", hAuth.SocialAuth).Methods(http.MethodGet)
+	WebRouter.HandleFunc("/auth/vk/", hAuth.SocialAuth).Methods(http.MethodGet)
 
 	//Poll
 	hPoll := poll_service.MustNewHandlerPoll()
