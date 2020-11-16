@@ -211,7 +211,7 @@ func (h Service) LoginSocial(token string) (*userService.Users, error) {
 	}
 
 	var existing = &userService.Users{}
-	fmt.Printf("VK RESPONSE ID: %T", vkResp.Response.ID)
+	fmt.Printf("VK RESPONSE ID: %d", vkResp.Response.ID)
 	h.conn.GetConnection().Where(fmt.Sprintf("email LIKE '%d@vk.com'", vkResp.Response.ID)).Find(existing)
 
 	if existing.ID != 0 {
