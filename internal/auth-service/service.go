@@ -182,6 +182,7 @@ func (h Service) UpdateTokens(jwtRefreshToken string) (map[string]string, error)
 
 func (h Service) LoginSocial(token string) (*userService.Users, error) {
 	ctx := context.Background()
+	h.vkConf.RedirectURL = "https://oauth.vk.com/blank.html"
 	vkToken, err := h.vkConf.Exchange(ctx, token)
 	if err != nil {
 		fmt.Println("Error" + err.Error())
