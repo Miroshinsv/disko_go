@@ -182,12 +182,11 @@ func (h Service) UpdateTokens(jwtRefreshToken string) (map[string]string, error)
 
 func (h Service) LoginSocial(token string) (*userService.Users, error) {
 	ctx := context.Background()
-
 	vkToken, err := h.vkConf.Exchange(ctx, token)
 	if err != nil {
+		fmt.Println("Error" + err.Error())
 		return (*userService.Users)(nil), err
 	}
-
 	var params = make(url.Values)
 	params.Add("access_token", vkToken.AccessToken)
 	params.Add("v", vkApiVersion)
@@ -227,7 +226,6 @@ func (h Service) LoginSocial(token string) (*userService.Users, error) {
 	}
 
 	db := h.conn.GetConnection().Create(dbUser)
-
 	return dbUser, db.Error
 }
 
