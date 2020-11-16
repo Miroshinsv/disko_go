@@ -205,13 +205,13 @@ func (h Service) LoginSocial(token string) (*userService.Users, error) {
 	}
 
 	var vkResp models.VKResponse
-	fmt.Printf("VK RESPONSE ID: %T", vkResp.Response.ID)
 	err = json.Unmarshal(body, &vkResp)
 	if err != nil {
 		return (*userService.Users)(nil), err
 	}
 
 	var existing = &userService.Users{}
+	fmt.Printf("VK RESPONSE ID: %T", vkResp.Response.ID)
 	h.conn.GetConnection().Where(fmt.Sprintf("email LIKE '%d@vk.com'", vkResp.Response.ID)).Find(existing)
 
 	if existing.ID != 0 {
