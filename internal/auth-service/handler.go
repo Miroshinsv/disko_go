@@ -3,6 +3,7 @@ package auth_service
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -34,14 +35,15 @@ func (h Handler) Register(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
+		fmt.Print(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
-
 		return
 	}
 
 	var user models.User
 	err = json.Unmarshal(body, &user)
 	if err != nil {
+		fmt.Print(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 
 		return
@@ -49,6 +51,7 @@ func (h Handler) Register(w http.ResponseWriter, r *http.Request) {
 
 	dbUser, err := h.service.RegisterUser(user)
 	if err != nil {
+		fmt.Print(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(err.Error())
 
