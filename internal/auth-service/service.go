@@ -79,6 +79,7 @@ func (h Service) RegisterUser(u models.User) (*userService.Users, error) {
 		Email:      *u.Email,
 		Phone:      "",
 		AvatarUrl:  *u.AvatarUrl,
+		VkId:       *u.VkId,
 		Password:   fmt.Sprintf("%x", md5.Sum([]byte(*u.Password))),
 		Roles:      []*roleService.Roles{role},
 	}
