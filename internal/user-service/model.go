@@ -15,5 +15,6 @@ type Users struct {
 	Phone      string
 	Password   string `json:"-"`
 	AvatarUrl  string
+	VkId       string
 	Roles      []*roleService.Roles `gorm:"many2many:users_roles;"`
 }
