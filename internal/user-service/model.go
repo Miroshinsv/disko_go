@@ -9,7 +9,7 @@ import (
 type Users struct {
 	gorm.Model
 	FirstName  string
-	SureName   string
+	LastName   string
 	MiddleName string
 	Email      string
 	Phone      string

@@ -74,7 +74,7 @@ func (h Service) RegisterUser(u models.User) (*userService.Users, error) {
 	var dbUser = &userService.Users{
 		Model:      gorm.Model{},
 		FirstName:  "",
-		SureName:   "",
+		LastName:   "",
 		MiddleName: "",
 		Email:      *u.Email,
 		Phone:      "",
@@ -222,7 +222,7 @@ func (h Service) LoginSocial(token string) (*userService.Users, error) {
 	var dbUser = &userService.Users{
 		Model:     gorm.Model{},
 		FirstName: vkResp.Response.FirstName,
-		SureName:  vkResp.Response.LastName,
+		LastName:  vkResp.Response.LastName,
 		Email:     fmt.Sprintf("email LIKE '%d@vk.com'", vkResp.Response.ID),
 		Password:  fmt.Sprintf("%x", md5.Sum([]byte(vkDefPassword))),
 	}
