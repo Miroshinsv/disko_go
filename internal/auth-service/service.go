@@ -73,11 +73,12 @@ func (h Service) RegisterUser(u models.User) (*userService.Users, error) {
 
 	var dbUser = &userService.Users{
 		Model:      gorm.Model{},
-		FirstName:  "",
-		LastName:   "",
+		FirstName:  *u.FirstName,
+		LastName:   *u.LastName,
 		MiddleName: "",
 		Email:      *u.Email,
 		Phone:      "",
+		AvatarUrl:  *u.AvatarUrl,
 		Password:   fmt.Sprintf("%x", md5.Sum([]byte(*u.Password))),
 		Roles:      []*roleService.Roles{role},
 	}
