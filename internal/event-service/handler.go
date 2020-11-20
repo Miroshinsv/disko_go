@@ -21,6 +21,19 @@ func (h Handler) Health(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func (h Handler) DeleteEventById(w http.ResponseWriter, r *http.Request) {
+	i, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode("Invalid id")
+		return
+	}
+
+	h.conn.GetConnection().Where(Events{}, i).Delete(&Events{}, i)
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode("Event disband")
+}
+
 func (h Handler) DeactivateEventById(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
