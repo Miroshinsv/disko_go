@@ -126,6 +126,7 @@ func registerAutoPolls(log loggerService.ILogger) {
 
 					return
 				}
+				log.Info("scheduling polls", nil)
 			}
 		}
 	}()
