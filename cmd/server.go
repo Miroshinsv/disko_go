@@ -98,6 +98,7 @@ func registerShutdown(ctx context.Context, log loggerService.ILogger, web webSer
 
 func registerAutoPolls(log loggerService.ILogger) {
 	ticker := time.NewTicker(5 * time.Minute) //@todo: move to env
+	log.Info("Start autopolls", nil)
 	go func() {
 		n := time.Now()
 		tm := time.Now().Add(24 * time.Hour)
