@@ -85,6 +85,20 @@ func (s Service) Vote(voice int, poll *models.Poll, user *userService.Users) err
 	}).Error
 }
 
+func (s Service) CountVoices(poll *models.Poll) (int, error) {
+	if time.Now().Before(poll.DueDate) && poll.IsHidden {
+		var vote = &models.Vote{}
+		s.conn.GetConnection().Where(fmt.Sprintf("poll_id=%d", poll.ID)).Find(vote)
+	}
+
+	var votes []models.Vote
+	db := s.conn.GetConnection().Where(fmt.Sprintf("poll_id=%d", poll.ID)).Find(&votes)
+	if db.Error != nil {
+		return 0, db.Error
+	}
+	return len(votes), nil
+}
+
 func (s Service) ShowResults(poll *models.Poll, user *userService.Users) (map[int][]models.Vote, error) {
 	if time.Now().Before(poll.DueDate) && poll.IsHidden {
 		var vote = &models.Vote{}

@@ -93,6 +93,7 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/poll/update/{id}/", hPoll.Update).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/poll/vote/{id}/", hPoll.Vote).Methods(http.MethodGet).Name("protected_poll_vote")
 	WebRouter.HandleFunc("/poll/view/{id}/", hPoll.View).Methods(http.MethodGet).Name("protected_poll_view")
+	WebRouter.HandleFunc("/poll/count/{id}/", hPoll.Count).Methods(http.MethodGet)
 
 	//Health
 	WebRouter.HandleFunc("/events/health", hEvents.Health).Methods(http.MethodGet)
