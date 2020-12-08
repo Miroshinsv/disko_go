@@ -156,7 +156,6 @@ func (h Handler) View(w http.ResponseWriter, r *http.Request) {
 	if db.Error != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode("invalid poll ID")
-
 		return
 	}
 
@@ -164,10 +163,36 @@ func (h Handler) View(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(res)
+}
+
+func (h Handler) Count(w http.ResponseWriter, r *http.Request) {
+	i, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode("Invalid id")
 
 		return
 	}
 
+	var poll = &models.Poll{}
+	db := h.conn.GetConnection().Where(fmt.Sprintf("id=%d", i)).Find(poll)
+	if db.Error != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode("invalid poll ID")
+		return
+	}
+
+	res, err := h.service.CountVoices(poll)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(err)
+		return
+	}
+	fmt.Println(res)
 	_ = json.NewEncoder(w).Encode(res)
 }
 
