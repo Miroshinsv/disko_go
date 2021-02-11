@@ -19,9 +19,7 @@ var WebRouter *mux.Router
 
 func jsonMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Access-Control-Allow-Origin", "*")
-		w.Header().Add("Access-Control-Allow-Headers", "Origin, Content-Type, X-Auth-Token")
-		w.Header().Add("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Content-Type", "application/json")
 		next.ServeHTTP(w, r)
 	})
