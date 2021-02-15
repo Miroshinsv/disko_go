@@ -108,6 +108,16 @@ func (s Service) ShowResults(poll *models.Poll, user *userService.Users) (map[in
 	return result, nil
 }
 
+func (s Service) ShowVotesCount(poll *models.Poll) (int, error) {
+	var votes []models.Vote
+	db := s.conn.GetConnection().Where(fmt.Sprintf("poll_id=%d", poll.ID)).Preload("User").Find(&votes)
+	if db.Error != nil {
+		return 0, db.Error
+	}
+
+	return len(votes), nil
+}
+
 func (s Service) ScheduleAutoPolls(events []event_service.Events, dt time.Time) error {
 	var (
 		eventIds = make([]uint, 0)

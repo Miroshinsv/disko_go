@@ -3,9 +3,12 @@ package event_service
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"regexp"
 	"strings"
+
+	"github.com/jinzhu/gorm"
+
+	"github.com/Miroshinsv/disko_go/internal/poll-service/models"
 )
 
 var regReplace = regexp.MustCompile("[{}\"]")
@@ -18,17 +21,18 @@ type EventsType struct {
 
 type Events struct {
 	gorm.Model
-	Type        EventsType `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
-	TypeId      int        `json:"type_id"`
-	Name        string     `json:"name"`
-	Days        string     `json:"days"`
-	IsActive    bool       `json:"is_active"`
-	Description string     `json:"description"`
-	Price       string     `json:"price"`
-	StartTime   string     `json:"start_time"`
-	Logo        string     `json:"logo"`
-	Lat         float32    `json:"lat"`
-	Lng         float32    `json:"lng"`
+	Type        EventsType    `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
+	Polls       []models.Poll `gorm:"foreignKey:EventId"`
+	TypeId      int           `json:"type_id"`
+	Name        string        `json:"name"`
+	Days        string        `json:"days"`
+	IsActive    bool          `json:"is_active"`
+	Description string        `json:"description"`
+	Price       string        `json:"price"`
+	StartTime   string        `json:"start_time"`
+	Logo        string        `json:"logo"`
+	Lat         float32       `json:"lat"`
+	Lng         float32       `json:"lng"`
 }
 
 func (d *Events) UnmarshalJSON(data []byte) error {
@@ -70,16 +74,21 @@ func (d *Events) UnmarshalJSON(data []byte) error {
 func (d Events) MarshalJSON() ([]byte, error) {
 	type outcome struct {
 		gorm.Model
-		Type        EventsType `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
-		Name        string     `json:"name"`
-		Days        string     `json:"days"`
-		IsActive    bool       `json:"is_active"`
-		Description string     `json:"description"`
-		Price       string     `json:"price"`
-		StartTime   string     `json:"start_time"`
-		Logo        string     `json:"logo"`
-		Lat         float32    `json:"lat"`
-		Lng         float32    `json:"lng"`
+		Type        EventsType    `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
+		Polls       []models.Poll `gorm:"foreignKey:EventId"`
+		Name        string        `json:"name"`
+		Days        string        `json:"days"`
+		IsActive    bool          `json:"is_active"`
+		Description string        `json:"description"`
+		Price       string        `json:"price"`
+		StartTime   string        `json:"start_time"`
+		Logo        string        `json:"logo"`
+		Lat         float32       `json:"lat"`
+		Lng         float32       `json:"lng"`
+	}
+
+	for i, j := 0, len(d.Polls)-1; i < j; i, j = i+1, j-1 {
+		d.Polls[i], d.Polls[j] = d.Polls[j], d.Polls[i]
 	}
 
 	var out = outcome{
@@ -87,6 +96,7 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		Name:        d.Name,
 		IsActive:    d.IsActive,
 		Type:        d.Type,
+		Polls:       d.Polls,
 		Days:        regReplace.ReplaceAllString(d.Days, ""),
 		Description: d.Description,
 		Price:       d.Price,

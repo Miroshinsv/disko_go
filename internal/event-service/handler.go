@@ -92,7 +92,10 @@ func (h Handler) GetEventById(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	var events Events
-	h.conn.GetConnection().Preload("Type").Find(&events, i)
+	h.conn.GetConnection().
+		Preload("Type").
+		Preload("Polls").
+		Find(&events, i)
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(events)
@@ -100,7 +103,11 @@ func (h Handler) GetEventById(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) GetAllEvents(w http.ResponseWriter, _ *http.Request) {
 	var events []Events
-	h.conn.GetConnection().Preload("Type").Find(&events)
+	h.conn.GetConnection().
+		Preload("Type").
+		Preload("Polls").
+		Find(&events)
+
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(events)
