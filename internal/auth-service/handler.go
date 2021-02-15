@@ -9,7 +9,6 @@ import (
 	"regexp"
 
 	"github.com/Miroshinsv/disko_go/internal/auth-service/models"
-	config_service "github.com/Miroshinsv/disko_go/pkg/config-service"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 )
@@ -139,11 +138,10 @@ func (h Handler) SocialAuth(w http.ResponseWriter, r *http.Request) {
 func MustNewHandlerAuth() *Handler {
 	db, _ := dbConnector.GetDBConnection()
 	log := loggerService.GetLogger()
-	conf := config_service.GetConfigService()
 
 	return &Handler{
 		log:     log,
 		conn:    db,
-		service: MustNewAuthService(log, conf, db),
+		service: MustNewAuthService(log, db),
 	}
 }
