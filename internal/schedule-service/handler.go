@@ -32,6 +32,7 @@ type Handler struct {
 func (h Handler) LoadAllEvents(w http.ResponseWriter, _ *http.Request) {
 	var events []eventService.Events
 	h.conn.GetConnection().Preload("Type").
+		Preload("Polls").
 		Joins("LEFT JOIN events_types ON events.type_id = events_types.id").
 		Find(
 			&events,
