@@ -23,6 +23,7 @@ func (s Service) LoadEventsForDate(d time.Time) ([]eventService.Events, error) {
 	}
 
 	conn.GetConnection().Preload("Type").
+		Preload("Polls").
 		Joins("LEFT JOIN events_types ON events.type_id = events_types.id").
 		Where(fmt.Sprintf("'%s' = ANY(events.days) AND events.is_active = true", names[d.Weekday()])).
 		Find(&result)
@@ -43,6 +44,7 @@ func (s Service) LoadEventsForPeriod(from time.Time, to time.Time) (map[string][
 	}
 
 	conn.GetConnection().Preload("Type").
+		Preload("Polls").
 		Joins("LEFT JOIN events_types ON events.type_id = events_types.id").
 		Where("events.is_active = true AND events_types.is_repeatable = true").
 		Find(&events)
