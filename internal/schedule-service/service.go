@@ -2,7 +2,7 @@ package schedule_service
 
 import (
 	"fmt"
-	eventService "github.com/Miroshinsv/disko_go/internal/event-service"
+	"github.com/Miroshinsv/disko_go/internal/event-service/models"
 	db_connector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	"strings"
 	"time"
@@ -12,9 +12,9 @@ var self *Service = nil
 
 type Service struct{}
 
-func (s Service) LoadEventsForDate(d time.Time) ([]eventService.Events, error) {
+func (s Service) LoadEventsForDate(d time.Time) ([]models.Events, error) {
 	var (
-		result = make([]eventService.Events, 0)
+		result = make([]models.Events, 0)
 	)
 
 	conn, err := db_connector.GetDBConnection()
@@ -31,11 +31,11 @@ func (s Service) LoadEventsForDate(d time.Time) ([]eventService.Events, error) {
 	return result, nil
 }
 
-func (s Service) LoadEventsForPeriod(from time.Time, to time.Time) (map[string][]eventService.Events, error) {
+func (s Service) LoadEventsForPeriod(from time.Time, to time.Time) (map[string][]models.Events, error) {
 	var (
-		result  = make(map[string][]eventService.Events, 0)
-		events  []eventService.Events
-		tEvents []eventService.Events
+		result  = make(map[string][]models.Events, 0)
+		events  []models.Events
+		tEvents []models.Events
 	)
 
 	conn, err := db_connector.GetDBConnection()
@@ -69,8 +69,8 @@ func (s Service) LoadEventsForPeriod(from time.Time, to time.Time) (map[string][
 	return result, nil
 }
 
-func (s Service) findEventsForDate(d time.Time, events []eventService.Events) []eventService.Events {
-	var res = make([]eventService.Events, 0)
+func (s Service) findEventsForDate(d time.Time, events []models.Events) []models.Events {
+	var res = make([]models.Events, 0)
 
 	weekDay := strings.ToLower(d.Weekday().String())
 	for _, v := range events {

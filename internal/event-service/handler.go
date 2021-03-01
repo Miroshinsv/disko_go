@@ -3,6 +3,8 @@ package event_service
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Miroshinsv/disko_go/internal/event-service/models"
+	userService "github.com/Miroshinsv/disko_go/internal/user-service"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"github.com/gorilla/mux"
@@ -11,8 +13,9 @@ import (
 )
 
 type Handler struct {
-	log  loggerService.ILogger
-	conn dbConnector.IConnector
+	log     loggerService.ILogger
+	conn    dbConnector.IConnector
+	service *Service
 }
 
 func (h Handler) Health(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +32,7 @@ func (h Handler) DeleteEventById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.conn.GetConnection().Where(Events{}, i).Delete(&Events{}, i)
+	h.conn.GetConnection().Where(models.Events{}, i).Delete(&models.Events{}, i)
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode("Event disband")
 }
@@ -43,7 +46,7 @@ func (h Handler) DeactivateEventById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var events Events
+	var events models.Events
 	res := h.conn.GetConnection().Preload("Type").Find(&events, i)
 	if res.Error != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -75,8 +78,8 @@ func (h Handler) ActivateEventById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var events Events
-	h.conn.GetConnection().Preload("Type").Find(&events, i).Updates(Events{IsActive: true})
+	var events models.Events
+	h.conn.GetConnection().Preload("Type").Find(&events, i).Updates(models.Events{IsActive: true})
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(events)
@@ -91,7 +94,7 @@ func (h Handler) GetEventById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	var events Events
+	var events models.Events
 	h.conn.GetConnection().
 		Preload("Type").
 		Preload("Polls").
@@ -102,7 +105,7 @@ func (h Handler) GetEventById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) GetAllEvents(w http.ResponseWriter, _ *http.Request) {
-	var events []Events
+	var events []models.Events
 	h.conn.GetConnection().
 		Preload("Type").
 		Preload("Polls").
@@ -114,15 +117,14 @@ func (h Handler) GetAllEvents(w http.ResponseWriter, _ *http.Request) {
 }
 
 func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {
-	var event Events
-
+	var event models.Events
 	rErr := json.NewDecoder(r.Body).Decode(&event)
 	if rErr != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode("Invalid event: " + rErr.Error())
-
 		return
 	}
+	event.OwnerId = r.Context().Value("user").(*userService.Users).ID
 
 	err := h.conn.GetConnection().Save(&event)
 	if err.Error != nil {
@@ -134,10 +136,7 @@ func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) UpdateEventById(w http.ResponseWriter, r *http.Request) {
-	var (
-		nEvent Events
-		event  Events
-	)
+	var nEvent models.Events
 
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
@@ -146,19 +145,24 @@ func (h Handler) UpdateEventById(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
 	//@todo: cover error
 	_ = json.NewDecoder(r.Body).Decode(&nEvent)
-
-	h.conn.GetConnection().Find(&event, i).Updates(nEvent)
-	_ = json.NewEncoder(w).Encode(event)
+	err = h.service.Update(i, r.Context().Value("user").(*userService.Users).ID, &nEvent)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+	_ = json.NewEncoder(w).Encode("updated")
 }
 
 func MustNewHandlerEvent() *Handler {
 	db, _ := dbConnector.GetDBConnection()
+	log := loggerService.GetLogger()
 
 	return &Handler{
-		log:  loggerService.GetLogger(),
-		conn: db,
+		log:     loggerService.GetLogger(),
+		conn:    db,
+		service: MustNewEventService(log, db),
 	}
 }
