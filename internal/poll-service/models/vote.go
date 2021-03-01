@@ -18,6 +18,5 @@ type Vote struct {
 	PollId    int                `json:"-"`
 	User      *userService.Users `gorm:"ForeignKey:UserId;AssociationForeignKey:id"`
 	UserId    int                `json:"-"`
-	Voice     int
-	CreatedAt time.Time `json:"created_at"`
+	CreatedAt time.Time          `json:"created_at"`
 }

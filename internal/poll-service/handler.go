@@ -110,29 +110,17 @@ func (h Handler) Vote(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode("Invalid id")
-
 		return
 	}
-	if len(r.URL.Query()["vote"]) == 0 {
-		w.WriteHeader(http.StatusBadRequest)
 
-		return
-	}
-	vote, err := strconv.Atoi(r.URL.Query()["vote"][0])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
 	var poll = &models.Poll{}
 	db := h.conn.GetConnection().Where(fmt.Sprintf("id=%d", i)).Find(poll)
 	if db.Error != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode("invalid poll ID")
-
 		return
 	}
-	err = h.service.Vote(vote, poll, r.Context().Value("user").(*userService.Users))
+	err = h.service.Vote(poll, r.Context().Value("user").(*userService.Users))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(err)

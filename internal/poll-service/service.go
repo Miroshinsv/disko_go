@@ -66,11 +66,7 @@ func (s Service) Create(p models.Income) (*models.Poll, error) {
 	return dbPoll, nil
 }
 
-func (s Service) Vote(voice int, poll *models.Poll, user *userService.Users) error {
-	if !s.isVoiceValid(voice) {
-		return errorUnknownVoice
-	}
-
+func (s Service) Vote(poll *models.Poll, user *userService.Users) error {
 	var vote = &models.Vote{}
 	s.conn.GetConnection().Where(fmt.Sprintf("poll_id=%d AND user_id=%d", poll.ID, user.ID)).Find(vote)
 	if vote.ID != 0 {
@@ -80,32 +76,26 @@ func (s Service) Vote(voice int, poll *models.Poll, user *userService.Users) err
 	return s.conn.GetConnection().Create(&models.Vote{
 		PollId:    int(poll.ID),
 		UserId:    int(user.ID),
-		Voice:     voice,
 		CreatedAt: time.Now(),
 	}).Error
 }
 
-func (s Service) ShowResults(poll *models.Poll, user *userService.Users) (map[int][]models.Vote, error) {
+func (s Service) ShowResults(poll *models.Poll, user *userService.Users) ([]models.Vote, error) {
 	if time.Now().Before(poll.DueDate) && poll.IsHidden {
 		var vote = &models.Vote{}
 		s.conn.GetConnection().Where(fmt.Sprintf("poll_id=%d AND user_id=%d", poll.ID, user.ID)).Find(vote)
 		if vote.ID == 0 {
-			return map[int][]models.Vote{}, errorVoteNeeded
+			return []models.Vote{}, errorVoteNeeded
 		}
 	}
 
 	var votes []models.Vote
 	db := s.conn.GetConnection().Where(fmt.Sprintf("poll_id=%d", poll.ID)).Preload("User").Find(&votes)
 	if db.Error != nil {
-		return map[int][]models.Vote{}, db.Error
+		return []models.Vote{}, db.Error
 	}
 
-	var result = make(map[int][]models.Vote, 3)
-	for _, v := range votes {
-		result[v.Voice] = append(result[v.Voice], v)
-	}
-
-	return result, nil
+	return votes, nil
 }
 
 func (s Service) ShowVotesCount(poll *models.Poll) (int, error) {
