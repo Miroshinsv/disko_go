@@ -1,4 +1,4 @@
-package event_service
+package models
 
 import (
 	"encoding/json"
@@ -33,6 +33,7 @@ type Events struct {
 	Logo        string        `json:"logo"`
 	Lat         float32       `json:"lat"`
 	Lng         float32       `json:"lng"`
+	OwnerId     uint          `json:"owner_id"`
 }
 
 func (d *Events) UnmarshalJSON(data []byte) error {

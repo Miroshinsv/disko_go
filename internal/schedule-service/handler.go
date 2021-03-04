@@ -3,7 +3,7 @@ package schedule_service
 import (
 	"encoding/json"
 	"fmt"
-	eventService "github.com/Miroshinsv/disko_go/internal/event-service"
+	"github.com/Miroshinsv/disko_go/internal/event-service/models"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"net/http"
@@ -30,7 +30,7 @@ type Handler struct {
 }
 
 func (h Handler) LoadAllEvents(w http.ResponseWriter, _ *http.Request) {
-	var events []eventService.Events
+	var events []models.Events
 	h.conn.GetConnection().Preload("Type").
 		Preload("Polls").
 		Joins("LEFT JOIN events_types ON events.type_id = events_types.id").

@@ -21,6 +21,10 @@ type Handler struct {
 	service *Service
 }
 
+var (
+	invalidPollId = "Invalid poll ID"
+)
+
 func (h Handler) Create(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -80,7 +84,7 @@ func (h Handler) Update(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 
 		return
 	}
@@ -109,7 +113,7 @@ func (h Handler) Vote(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 		return
 	}
 
@@ -117,7 +121,7 @@ func (h Handler) Vote(w http.ResponseWriter, r *http.Request) {
 	db := h.conn.GetConnection().Where(fmt.Sprintf("id=%d", i)).Find(poll)
 	if db.Error != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("invalid poll ID")
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 		return
 	}
 	err = h.service.Vote(poll, r.Context().Value("user").(*userService.Users))
@@ -133,8 +137,7 @@ func (h Handler) View(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
-
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 		return
 	}
 
@@ -142,8 +145,7 @@ func (h Handler) View(w http.ResponseWriter, r *http.Request) {
 	db := h.conn.GetConnection().Where(fmt.Sprintf("id=%d", i)).Find(poll)
 	if db.Error != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("invalid poll ID")
-
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 		return
 	}
 
@@ -151,7 +153,6 @@ func (h Handler) View(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(err)
-
 		return
 	}
 
@@ -162,7 +163,7 @@ func (h Handler) ShowCount(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 
 		return
 	}
@@ -171,7 +172,7 @@ func (h Handler) ShowCount(w http.ResponseWriter, r *http.Request) {
 	db := h.conn.GetConnection().Where(fmt.Sprintf("id=%d", i)).Find(poll)
 	if db.Error != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("invalid poll ID")
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 
 		return
 	}

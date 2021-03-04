@@ -3,11 +3,10 @@ package poll_service
 import (
 	"errors"
 	"fmt"
+	"github.com/jinzhu/gorm"
 	"time"
 
-	"github.com/jinzhu/gorm"
-
-	event_service "github.com/Miroshinsv/disko_go/internal/event-service"
+	eventModel "github.com/Miroshinsv/disko_go/internal/event-service/models"
 	"github.com/Miroshinsv/disko_go/internal/poll-service/models"
 	userService "github.com/Miroshinsv/disko_go/internal/user-service"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
@@ -36,7 +35,7 @@ type Service struct {
 func (s Service) Create(p models.Income) (*models.Poll, error) {
 	var (
 		existing = &models.Poll{}
-		event    = &event_service.Events{}
+		event    = &eventModel.Events{}
 	)
 
 	s.conn.GetConnection().Where(
@@ -108,7 +107,7 @@ func (s Service) ShowVotesCount(poll *models.Poll) (int, error) {
 	return len(votes), nil
 }
 
-func (s Service) ScheduleAutoPolls(events []event_service.Events, dt time.Time) error {
+func (s Service) ScheduleAutoPolls(events []eventModel.Events, dt time.Time) error {
 	var (
 		eventIds = make([]uint, 0)
 		plEIds   = make(map[int]models.Poll, 0)
