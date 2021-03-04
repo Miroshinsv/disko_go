@@ -8,15 +8,22 @@ import (
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 	"net/http"
 	"strconv"
 )
 
 type Handler struct {
-	log     loggerService.ILogger
-	conn    dbConnector.IConnector
-	service *Service
+	log          loggerService.ILogger
+	conn         dbConnector.IConnector
+	eventService *Service
 }
+
+var (
+	invalidEventId  = errors.New("Invalid event ID")
+	cantUpdateEvent = errors.New("Can't update event")
+	eventUpdated    = "Event update"
+)
 
 func (h Handler) Health(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(map[string]interface{}{
@@ -28,20 +35,20 @@ func (h Handler) DeleteEventById(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
+		_ = json.NewEncoder(w).Encode(invalidEventId.Error())
 		return
 	}
 
 	h.conn.GetConnection().Where(models.Events{}, i).Delete(&models.Events{}, i)
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode("Event disband")
+	_ = json.NewEncoder(w).Encode(invalidEventId.Error())
 }
 
 func (h Handler) DeactivateEventById(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
+		_ = json.NewEncoder(w).Encode(invalidEventId.Error())
 
 		return
 	}
@@ -73,7 +80,7 @@ func (h Handler) ActivateEventById(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
+		_ = json.NewEncoder(w).Encode(invalidEventId.Error())
 
 		return
 	}
@@ -89,7 +96,7 @@ func (h Handler) GetEventById(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
+		_ = json.NewEncoder(w).Encode(invalidEventId.Error())
 
 		return
 	}
@@ -128,7 +135,7 @@ func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {
 
 	err := h.conn.GetConnection().Save(&event)
 	if err.Error != nil {
-		_ = json.NewEncoder(w).Encode("Can't add event")
+		_ = json.NewEncoder(w).Encode(cantUpdateEvent.Error())
 	} else {
 		h.conn.GetConnection().Preload("Type").Find(&event, event.ID)
 		_ = json.NewEncoder(w).Encode(event)
@@ -141,19 +148,19 @@ func (h Handler) UpdateEventById(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
+		_ = json.NewEncoder(w).Encode(invalidEventId.Error())
 
 		return
 	}
 	//@todo: cover error
 	_ = json.NewDecoder(r.Body).Decode(&nEvent)
-	err = h.service.Update(i, r.Context().Value("user").(*userService.Users).ID, &nEvent)
+	err = h.eventService.Update(i, r.Context().Value("user").(*userService.Users).ID, &nEvent)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(err.Error())
 		return
 	}
-	_ = json.NewEncoder(w).Encode("updated")
+	_ = json.NewEncoder(w).Encode(eventUpdated)
 }
 
 func MustNewHandlerEvent() *Handler {
@@ -161,8 +168,8 @@ func MustNewHandlerEvent() *Handler {
 	log := loggerService.GetLogger()
 
 	return &Handler{
-		log:     loggerService.GetLogger(),
-		conn:    db,
-		service: MustNewEventService(log, db),
+		log:          loggerService.GetLogger(),
+		conn:         db,
+		eventService: MustNewEventService(log, db),
 	}
 }
