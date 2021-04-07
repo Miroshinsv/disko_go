@@ -11,17 +11,14 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
-	"github.com/jinzhu/gorm"
-	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/vk"
-
 	"github.com/Miroshinsv/disko_go/internal/auth-service/models"
 	roleService "github.com/Miroshinsv/disko_go/internal/role-service"
 	userService "github.com/Miroshinsv/disko_go/internal/user-service"
-	config_service "github.com/Miroshinsv/disko_go/pkg/config-service"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
+	"github.com/dgrijalva/jwt-go"
+	"github.com/jinzhu/gorm"
+	"golang.org/x/oauth2"
 )
 
 const (
@@ -245,28 +242,13 @@ func (h Service) LoginSocial(token string) (*userService.Users, error) {
 	return dbUser, db.Error
 }
 
-func MustNewAuthService(log loggerService.ILogger, confService config_service.IConfig, conn dbConnector.IConnector) *Service {
+func MustNewAuthService(log loggerService.ILogger, conn dbConnector.IConnector) *Service {
 	if self == nil {
-		var confAuth Config
-		err := confService.Convert(&confAuth)
-		if err != nil {
-			log.Fatal("error on initializing auth service", err, nil)
-		}
-
-		conf := &oauth2.Config{
-			ClientID:     confAuth.VKClientID,
-			ClientSecret: confAuth.VKClientSecret,
-			Scopes:       []string{},
-			Endpoint:     vk.Endpoint,
-		}
-
 		self = &Service{
-			log:    log,
-			conn:   conn,
-			vkConf: conf,
+			log:  log,
+			conn: conn,
 		}
 	}
-
 	return self
 }
 
@@ -274,6 +256,5 @@ func GetAuthService() *Service {
 	if self == nil {
 		panic("service not init")
 	}
-
 	return self
 }

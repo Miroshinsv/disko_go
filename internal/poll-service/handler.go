@@ -21,6 +21,10 @@ type Handler struct {
 	service *Service
 }
 
+var (
+	invalidPollId = "Invalid poll ID"
+)
+
 func (h Handler) Create(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
@@ -80,7 +84,7 @@ func (h Handler) Update(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 
 		return
 	}
@@ -109,31 +113,18 @@ func (h Handler) Vote(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
-
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 		return
 	}
-	if len(r.URL.Query()["vote"]) == 0 {
-		w.WriteHeader(http.StatusBadRequest)
 
-		return
-	}
-	vote, err := strconv.Atoi(r.URL.Query()["vote"][0])
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-
-		return
-	}
 	var poll = &models.Poll{}
 	db := h.conn.GetConnection().Where(fmt.Sprintf("id=%d", i)).Find(poll)
 	if db.Error != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("invalid poll ID")
-
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 		return
 	}
-	err = h.service.Vote(vote, poll, r.Context().Value("user").(*userService.Users))
-	fmt.Println(err)
+	err = h.service.Vote(poll, r.Context().Value("user").(*userService.Users))
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(err)
@@ -146,7 +137,33 @@ func (h Handler) View(w http.ResponseWriter, r *http.Request) {
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("Invalid id")
+		_ = json.NewEncoder(w).Encode(invalidPollId)
+		return
+	}
+
+	var poll = &models.Poll{}
+	db := h.conn.GetConnection().Where(fmt.Sprintf("id=%d", i)).Find(poll)
+	if db.Error != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(invalidPollId)
+		return
+	}
+
+	res, err := h.service.ShowResults(poll, r.Context().Value("user").(*userService.Users))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(err)
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(res)
+}
+
+func (h Handler) ShowCount(w http.ResponseWriter, r *http.Request) {
+	i, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 
 		return
 	}
@@ -155,20 +172,23 @@ func (h Handler) View(w http.ResponseWriter, r *http.Request) {
 	db := h.conn.GetConnection().Where(fmt.Sprintf("id=%d", i)).Find(poll)
 	if db.Error != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode("invalid poll ID")
+		_ = json.NewEncoder(w).Encode(invalidPollId)
 
 		return
 	}
 
-	res, err := h.service.ShowResults(poll, r.Context().Value("user").(*userService.Users))
+	res, err := h.service.ShowVotesCount(poll)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		_ = json.NewEncoder(w).Encode(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		_ = json.NewEncoder(w).Encode("internal error")
 
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(res)
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
+		"poll":  poll,
+		"votes": res,
+	})
 }
 
 func MustNewHandlerPoll() *Handler {

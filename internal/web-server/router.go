@@ -44,8 +44,8 @@ func RegisterHandlers() {
 	hEvents := eventService.MustNewHandlerEvent()
 	WebRouter.HandleFunc("/events/get/all/", hEvents.GetAllEvents).Methods(http.MethodGet)
 	WebRouter.HandleFunc("/events/get/{id}/", hEvents.GetEventById).Methods(http.MethodGet)
-	WebRouter.HandleFunc("/events/add/", hEvents.AddEvent).Methods(http.MethodPost)
-	WebRouter.HandleFunc("/events/update/{id}/", hEvents.UpdateEventById).Methods(http.MethodPost)
+	WebRouter.HandleFunc("/events/add/", hEvents.AddEvent).Methods(http.MethodPost).Name("protected_event_add")
+	WebRouter.HandleFunc("/events/update/{id}/", hEvents.UpdateEventById).Methods(http.MethodPost).Name("protected_event_update")
 	WebRouter.HandleFunc("/events/activate/{id}/", hEvents.ActivateEventById).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/events/deactivate/{id}/", hEvents.DeactivateEventById).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/events/disband/{id}/", hEvents.DeleteEventById).Methods(http.MethodPost)
@@ -85,7 +85,6 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/auth/register/", hAuth.Register).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/auth/login/", hAuth.Login).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/auth/refresh/", hAuth.UpdateTokens).Methods(http.MethodGet)
-	WebRouter.HandleFunc("/auth/vk/", hAuth.SocialAuth).Methods(http.MethodGet)
 
 	//Poll
 	hPoll := poll_service.MustNewHandlerPoll()
@@ -93,6 +92,7 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/poll/update/{id}/", hPoll.Update).Methods(http.MethodPost)
 	WebRouter.HandleFunc("/poll/vote/{id}/", hPoll.Vote).Methods(http.MethodGet).Name("protected_poll_vote")
 	WebRouter.HandleFunc("/poll/view/{id}/", hPoll.View).Methods(http.MethodGet).Name("protected_poll_view")
+	WebRouter.HandleFunc("/poll/count/{id}", hPoll.ShowCount).Methods(http.MethodGet)
 
 	//Health
 	WebRouter.HandleFunc("/events/health", hEvents.Health).Methods(http.MethodGet)
