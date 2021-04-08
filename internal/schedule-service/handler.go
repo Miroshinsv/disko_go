@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Miroshinsv/disko_go/internal/event-service/models"
+	models2 "github.com/Miroshinsv/disko_go/internal/user-service"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"net/http"
@@ -29,14 +30,23 @@ type Handler struct {
 	conn dbConnector.IConnector
 }
 
-func (h Handler) LoadAllEvents(w http.ResponseWriter, _ *http.Request) {
-	var events []models.Events
-	h.conn.GetConnection().Preload("Type").
+func (h Handler) LoadAllEvents(w http.ResponseWriter, r *http.Request) {
+	var (
+		events []models.Events
+	)
+
+	stm := h.conn.GetConnection().Preload("Type").
 		Preload("Polls").
 		Joins("LEFT JOIN events_types ON events.type_id = events_types.id").
+		Where("events.is_active = true")
+
+	if u, ok := r.Context().Value("user").(*models2.Users); ok {
+		stm = stm.Where(fmt.Sprintf("events.owner_id = %d", u.ID))
+	}
+
+	stm.
 		Find(
 			&events,
-			fmt.Sprintf("events.is_active = true"),
 		)
 
 	w.WriteHeader(http.StatusOK)

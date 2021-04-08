@@ -56,8 +56,8 @@ func (h Service) RegisterUser(u models.User) (*userService.Users, error) {
 		return &userService.Users{}, errorUnknownRole
 	}
 
-	var role = &roleService.Roles{}
-	h.conn.GetConnection().Where(fmt.Sprintf("id=%d", *u.Role)).Find(&role)
+	var role = new(roleService.Roles)
+	h.conn.GetConnection().Where(fmt.Sprintf("id=%d", *u.Role)).Find(role)
 	if role == nil || role.ID == 0 {
 		return &userService.Users{}, errorUnknownRole
 	}
@@ -171,7 +171,7 @@ func (h Service) GetUserByJWT(jwtToken string, jwtType string) (*userService.Use
 		return dbUser, errorInvalidToken
 	}
 
-	h.conn.GetConnection().Where(fmt.Sprintf("id = %s", claims.Issuer)).Find(dbUser)
+	h.conn.GetConnection().Where(fmt.Sprintf("id = %s", claims.Issuer)).Preload("Roles").Find(dbUser)
 	if dbUser.ID == 0 {
 		return dbUser, errorInvalidToken
 	}
