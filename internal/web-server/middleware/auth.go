@@ -17,14 +17,19 @@ const (
 
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.Contains(mux.CurrentRoute(r).GetName(), protectedPrefix) {
-			next.ServeHTTP(w, r)
-			return
-		}
+		//if !strings.Contains(mux.CurrentRoute(r).GetName(), protectedPrefix) {
+		//	next.ServeHTTP(w, r)
+		//	return
+		//}
 
 		token := r.Header.Get(AuthHeader)
 		if token == "" {
-			w.WriteHeader(http.StatusUnauthorized)
+			if strings.Contains(mux.CurrentRoute(r).GetName(), protectedPrefix) {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+
+			next.ServeHTTP(w, r)
 
 			return
 		}
