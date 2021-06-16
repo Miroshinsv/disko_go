@@ -21,6 +21,13 @@ func CORSMethodMiddleware(r *mux.Router) mux.MiddlewareFunc {
 			w.Header().Set("Access-Control-Allow-Methods", "*")
 			w.Header().Set("Access-Control-Allow-Headers", "*")
 			w.Header().Set("Access-Control-Allow-Origin", "*")
+
+			if req.Method == http.MethodOptions {
+				w.WriteHeader(http.StatusOK)
+
+				return
+			}
+
 			next.ServeHTTP(w, req)
 		})
 	}
