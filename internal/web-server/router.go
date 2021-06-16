@@ -17,21 +17,23 @@ import (
 
 var WebRouter *mux.Router
 
-func jsonMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS,PUT")
-		w.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type")
-		w.Header().Add("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
-	})
+func CORSMethodMiddleware(r *mux.Router) mux.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			w.Header().Set("Access-Control-Allow-Methods", "*")
+			w.Header().Set("Access-Control-Allow-Headers", "*")
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+
+			next.ServeHTTP(w, req)
+		})
+	}
 }
 
 func RegisterHandlers() {
 	WebRouter = mux.NewRouter()
 	WebRouter.StrictSlash(true)
 
-	WebRouter.Use(jsonMiddleware)
+	WebRouter.Use(middleware.CORSMethodMiddleware(WebRouter))
 	WebRouter.Use(middleware.AuthMiddleware)
 
 	//Directions
