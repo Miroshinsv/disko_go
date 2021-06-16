@@ -81,9 +81,8 @@ func (s Service) Vote(poll *models.Poll, user *userService.Users) error {
 
 func (s Service) ShowResults(poll *models.Poll, user *userService.Users) ([]models.Vote, error) {
 	if time.Now().Before(poll.DueDate) && poll.IsHidden {
-		var vote = &models.Vote{}
-		s.conn.GetConnection().Where(fmt.Sprintf("poll_id=%d AND user_id=%d", poll.ID, user.ID)).Find(vote)
-		if vote.ID == 0 {
+		err := s.conn.GetConnection().Where(fmt.Sprintf("poll_id=%d AND user_id=%d", poll.ID, user.ID)).Find(&models.Vote{}).Error
+		if gorm.IsRecordNotFoundError(err) {
 			return []models.Vote{}, errorVoteNeeded
 		}
 	}
