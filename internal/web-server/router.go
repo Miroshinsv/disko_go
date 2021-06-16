@@ -24,6 +24,10 @@ func RegisterHandlers() {
 	WebRouter.Use(middleware.CORSMethodMiddleware(WebRouter))
 	WebRouter.Use(middleware.AuthMiddleware)
 
+	WebRouter.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusAccepted)
+	})
+
 	//Directions
 	hDirection := directionService.MustNewHandlerDirection()
 	WebRouter.HandleFunc("/direction/get/all/", hDirection.GetAllDirections).Methods(http.MethodGet)
