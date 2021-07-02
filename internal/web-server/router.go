@@ -23,6 +23,7 @@ func RegisterHandlers() {
 
 	WebRouter.Use(middleware.CORSMethodMiddleware(WebRouter))
 	WebRouter.Use(middleware.AuthMiddleware)
+	WebRouter.Use(middleware.AuthAdminMiddleware)
 
 	WebRouter.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -32,9 +33,9 @@ func RegisterHandlers() {
 	hDirection := directionService.MustNewHandlerDirection()
 	WebRouter.HandleFunc("/direction/get/all/", hDirection.GetAllDirections).Methods(http.MethodGet, http.MethodOptions)
 	WebRouter.HandleFunc("/direction/get/{id}/", hDirection.GetDirectionById).Methods(http.MethodGet, http.MethodOptions)
-	WebRouter.HandleFunc("/direction/update/{id}/", hDirection.UpdateDirectionById).Methods(http.MethodPost, http.MethodOptions)
-	WebRouter.HandleFunc("/direction/disband/{id}/", hDirection.DisbandDirectionById).Methods(http.MethodPost, http.MethodOptions)
-	WebRouter.HandleFunc("/direction/add/", hDirection.AddDirection).Methods(http.MethodPost, http.MethodOptions)
+	WebRouter.HandleFunc("/direction/update/{id}/", hDirection.UpdateDirectionById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/direction/disband/{id}/", hDirection.DisbandDirectionById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/direction/add/", hDirection.AddDirection).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
 
 	//Events
 	hEvents := eventService.MustNewHandlerEvent()
@@ -42,33 +43,33 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/events/get/{id}/", hEvents.GetEventById).Methods(http.MethodGet, http.MethodOptions)
 	WebRouter.HandleFunc("/events/add/", hEvents.AddEvent).Methods(http.MethodPost, http.MethodOptions).Name("protected_event_add")
 	WebRouter.HandleFunc("/events/update/{id}/", hEvents.UpdateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_event_update")
-	WebRouter.HandleFunc("/events/activate/{id}/", hEvents.ActivateEventById).Methods(http.MethodPost, http.MethodOptions)
-	WebRouter.HandleFunc("/events/deactivate/{id}/", hEvents.DeactivateEventById).Methods(http.MethodPost, http.MethodOptions)
-	WebRouter.HandleFunc("/events/disband/{id}/", hEvents.DeleteEventById).Methods(http.MethodPost, http.MethodOptions)
+	WebRouter.HandleFunc("/events/activate/{id}/", hEvents.ActivateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/events/deactivate/{id}/", hEvents.DeactivateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/events/disband/{id}/", hEvents.DeleteEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
 	WebRouter.HandleFunc("/events/types/all/", hEvents.GetEventsType).Methods(http.MethodGet, http.MethodOptions).Name("protected_event_type_get")
 
 	//Roles
 	hRoles := roleService.MustNewHandlerRole()
 	WebRouter.HandleFunc("/roles/get/all/", hRoles.GetAllRoles).Methods(http.MethodGet, http.MethodOptions)
 	WebRouter.HandleFunc("/roles/get/{id}/", hRoles.GetRoleById).Methods(http.MethodGet, http.MethodOptions)
-	WebRouter.HandleFunc("/roles/update/{id}/", hRoles.UpdateRoleById).Methods(http.MethodPost, http.MethodOptions)
-	WebRouter.HandleFunc("/roles/disband/{id}/", hRoles.DisbandRoleById).Methods(http.MethodPost, http.MethodOptions)
-	WebRouter.HandleFunc("/roles/add/", hRoles.AddRole).Methods(http.MethodPost, http.MethodOptions)
+	WebRouter.HandleFunc("/roles/update/{id}/", hRoles.UpdateRoleById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/roles/disband/{id}/", hRoles.DisbandRoleById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/roles/add/", hRoles.AddRole).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
 
 	//School
 	hSchool := schoolService.MustNewHandlerSchool()
 	WebRouter.HandleFunc("/schools/get/all/", hSchool.GetAllSchools).Methods(http.MethodGet, http.MethodOptions)
 	WebRouter.HandleFunc("/schools/get/{id}/", hSchool.GetSchoolById).Methods(http.MethodGet, http.MethodOptions)
-	WebRouter.HandleFunc("/schools/delete/{id}/", hSchool.DeleteSchoolById).Methods(http.MethodDelete, http.MethodOptions)
-	WebRouter.HandleFunc("/schools/add/", hSchool.AddSchool).Methods(http.MethodPost, http.MethodOptions)
-	WebRouter.HandleFunc("/schools/update/{id}/", hSchool.UpdateSchoolById).Methods(http.MethodPost, http.MethodOptions)
+	WebRouter.HandleFunc("/schools/delete/{id}/", hSchool.DeleteSchoolById).Methods(http.MethodDelete, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/schools/add/", hSchool.AddSchool).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/schools/update/{id}/", hSchool.UpdateSchoolById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
 
 	//Users
 	hUsers := userService.MustNewHandlerUser()
-	WebRouter.HandleFunc("/user/get/all/", hUsers.GetAllUsers).Methods(http.MethodGet, http.MethodOptions)
-	WebRouter.HandleFunc("/user/get/{id}/", hUsers.GetUserById).Methods(http.MethodGet, http.MethodOptions)
-	WebRouter.HandleFunc("/user/update/{id}/", hUsers.UpdateUserById).Methods(http.MethodPost, http.MethodOptions)
-	WebRouter.HandleFunc("/user/disband/{id}/", hUsers.DisbandUserById).Methods(http.MethodPost, http.MethodOptions)
+	WebRouter.HandleFunc("/user/get/all/", hUsers.GetAllUsers).Methods(http.MethodGet, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/user/get/{id}/", hUsers.GetUserById).Methods(http.MethodGet, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/user/update/{id}/", hUsers.UpdateUserById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/user/disband/{id}/", hUsers.DisbandUserById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
 	WebRouter.HandleFunc("/user/add/", hUsers.AddUser).Methods(http.MethodPost, http.MethodOptions)
 
 	//Schedule
@@ -86,7 +87,7 @@ func RegisterHandlers() {
 	//Poll
 	hPoll := poll_service.MustNewHandlerPoll()
 	WebRouter.HandleFunc("/poll/add/", hPoll.Create).Methods(http.MethodPost, http.MethodOptions)
-	WebRouter.HandleFunc("/poll/update/{id}/", hPoll.Update).Methods(http.MethodPost, http.MethodOptions)
+	WebRouter.HandleFunc("/poll/update/{id}/", hPoll.Update).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
 	WebRouter.HandleFunc("/poll/vote/{id}/", hPoll.Vote).Methods(http.MethodGet, http.MethodOptions).Name("protected_poll_vote")
 	WebRouter.HandleFunc("/poll/view/{id}/", hPoll.View).Methods(http.MethodGet, http.MethodOptions).Name("protected_poll_view")
 	WebRouter.HandleFunc("/poll/count/{id}/", hPoll.ShowCount).Methods(http.MethodGet, http.MethodOptions)
