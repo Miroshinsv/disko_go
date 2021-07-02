@@ -131,6 +131,7 @@ func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {
 		_ = json.NewEncoder(w).Encode("Invalid event: " + rErr.Error())
 		return
 	}
+
 	event.OwnerId = r.Context().Value("user").(*userService.Users).ID
 
 	err := h.conn.GetConnection().Save(&event)
@@ -161,6 +162,18 @@ func (h Handler) UpdateEventById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_ = json.NewEncoder(w).Encode(eventUpdated)
+}
+
+func (h Handler) GetEventsType(w http.ResponseWriter, r *http.Request) {
+	var nEventTypes []models.EventsType
+
+	err := h.eventService.FindEventsType(&nEventTypes)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+	_ = json.NewEncoder(w).Encode(nEventTypes)
 }
 
 func MustNewHandlerEvent() *Handler {

@@ -14,14 +14,23 @@ type Service struct {
 }
 
 var (
-	self             *Service = nil
-	errorUpdateEvent          = errors.New("Can't update event")
+	self                *Service = nil
+	errorUpdateEvent             = errors.New("Can't update event")
+	errorFindEventTypes          = errors.New("Can't find any events type")
 )
 
 func (s Service) Update(eId int, uId uint, event *models.Events) error {
 	err := s.conn.GetConnection().Model(event).Where(fmt.Sprintf("id=%d AND owner_id=%d", eId, uId)).Update(event)
 	if err.RowsAffected == 0 {
 		return errorUpdateEvent
+	}
+	return nil
+}
+
+func (s Service) FindEventsType(eventsType *[]models.EventsType) error {
+	err := s.conn.GetConnection().Find(eventsType)
+	if err.Value == 0 {
+		return errorFindEventTypes
 	}
 	return nil
 }

@@ -45,6 +45,7 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/events/activate/{id}/", hEvents.ActivateEventById).Methods(http.MethodPost, http.MethodOptions)
 	WebRouter.HandleFunc("/events/deactivate/{id}/", hEvents.DeactivateEventById).Methods(http.MethodPost, http.MethodOptions)
 	WebRouter.HandleFunc("/events/disband/{id}/", hEvents.DeleteEventById).Methods(http.MethodPost, http.MethodOptions)
+	WebRouter.HandleFunc("/events/types/all/", hEvents.GetEventsType).Methods(http.MethodGet, http.MethodOptions).Name("protected_event_type_get")
 
 	//Roles
 	hRoles := roleService.MustNewHandlerRole()
