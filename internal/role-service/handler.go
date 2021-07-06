@@ -40,7 +40,7 @@ func (h Handler) AddRole(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) UpdateRoleById(w http.ResponseWriter, r *http.Request) {
 	var (
-		nrole Roles
+		nRole Roles
 	)
 	var role Roles
 	i, err := strconv.Atoi(mux.Vars(r)["id"])
@@ -52,9 +52,9 @@ func (h Handler) UpdateRoleById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//@todo: cover error
-	_ = json.NewDecoder(r.Body).Decode(&nrole)
+	_ = json.NewDecoder(r.Body).Decode(&nRole)
 
-	h.conn.GetConnection().Where(&role, i).Update(nrole)
+	h.conn.GetConnection().Where(&role, i).Update(nRole)
 
 	_ = json.NewEncoder(w).Encode(role)
 }

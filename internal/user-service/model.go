@@ -18,3 +18,17 @@ type Users struct {
 	VkId       string
 	Roles      []*roleService.Roles `gorm:"many2many:users_roles;"`
 }
+
+func (u Users) IsAdmin() bool {
+	if len(u.Roles) == 0 {
+		return false
+	}
+
+	for _, v := range u.Roles {
+		if v.Admin {
+			return true
+		}
+	}
+
+	return false
+}

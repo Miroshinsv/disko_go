@@ -2,6 +2,7 @@ package user_service
 
 import (
 	"encoding/json"
+	rolesModel "github.com/Miroshinsv/disko_go/internal/role-service"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"github.com/gorilla/mux"
@@ -30,10 +31,16 @@ func (h Handler) DisbandUserById(w http.ResponseWriter, r *http.Request) {
 
 func (h Handler) AddUser(w http.ResponseWriter, r *http.Request) {
 	var d Users
+	var roles rolesModel.Roles
 
 	//@todo: cover error
 	_ = json.NewDecoder(r.Body).Decode(&d)
 
+	res := h.conn.GetConnection().Find(&roles).Where(rolesModel.Roles{Admin: false})
+
+	if res == nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
 	err := h.conn.GetConnection().Save(&d).Error
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)

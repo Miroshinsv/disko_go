@@ -2,11 +2,8 @@ package models
 
 import (
 	"encoding/json"
-	"fmt"
-	"regexp"
-	"strings"
-
 	"github.com/jinzhu/gorm"
+	"regexp"
 
 	"github.com/Miroshinsv/disko_go/internal/poll-service/models"
 )
@@ -17,6 +14,16 @@ type EventsType struct {
 	gorm.Model
 	EventsTypeName string
 	IsRepeatable   bool
+}
+
+type City struct {
+	gorm.Model
+	CityName string `json:"city_name"`
+	Country  string `json:"country"`
+}
+
+func (City) TableName() string {
+	return "city"
 }
 
 type Events struct {
@@ -34,6 +41,8 @@ type Events struct {
 	Lat         float32       `json:"lat"`
 	Lng         float32       `json:"lng"`
 	OwnerId     uint          `json:"owner_id"`
+	City        City
+	CityID      int
 }
 
 func (d *Events) UnmarshalJSON(data []byte) error {
@@ -48,6 +57,7 @@ func (d *Events) UnmarshalJSON(data []byte) error {
 		Logo        string  `json:"logo"`
 		Lat         float32 `json:"lat"`
 		Lng         float32 `json:"lng"`
+		City        City    `json:"city_id"`
 	}
 
 	var inc income
@@ -59,16 +69,14 @@ func (d *Events) UnmarshalJSON(data []byte) error {
 	d.Name = inc.Name
 	d.TypeId = inc.TypeId
 	d.IsActive = inc.IsActive
-
-	daysSlice := strings.Split(inc.Days, ",")
-	d.Days = fmt.Sprintf("{\"%s\"}", strings.Join(daysSlice, "\",\""))
-
+	d.Days = inc.Days
 	d.StartTime = inc.StartTime
 	d.Price = inc.Price
 	d.Description = inc.Description
 	d.Logo = inc.Logo
 	d.Lat = inc.Lat
 	d.Lng = inc.Lng
+	d.City = inc.City
 	return nil
 }
 
@@ -86,6 +94,7 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		Logo        string        `json:"logo"`
 		Lat         float32       `json:"lat"`
 		Lng         float32       `json:"lng"`
+		City        City          `gorm:"ForeignKey:CityId"`
 	}
 
 	for i, j := 0, len(d.Polls)-1; i < j; i, j = i+1, j-1 {
@@ -105,6 +114,7 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		Logo:        d.Logo,
 		Lat:         d.Lat,
 		Lng:         d.Lng,
+		City:        d.City,
 	}
 
 	return json.Marshal(out)
