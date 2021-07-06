@@ -2,6 +2,7 @@ package web_server
 
 import (
 	auth_service "github.com/Miroshinsv/disko_go/internal/auth-service"
+	city_service "github.com/Miroshinsv/disko_go/internal/city-service"
 	directionService "github.com/Miroshinsv/disko_go/internal/direction-service"
 	eventService "github.com/Miroshinsv/disko_go/internal/event-service"
 	poll_service "github.com/Miroshinsv/disko_go/internal/poll-service"
@@ -91,6 +92,14 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/poll/vote/{id}/", hPoll.Vote).Methods(http.MethodGet, http.MethodOptions).Name("protected_poll_vote")
 	WebRouter.HandleFunc("/poll/view/{id}/", hPoll.View).Methods(http.MethodGet, http.MethodOptions).Name("protected_poll_view")
 	WebRouter.HandleFunc("/poll/count/{id}/", hPoll.ShowCount).Methods(http.MethodGet, http.MethodOptions)
+
+	//Cities
+	hCity := city_service.MustNewHandlerCities()
+	WebRouter.HandleFunc("/city/add/", hCity.AddCity).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/city/all/", hCity.GetAllCities).Methods(http.MethodGet, http.MethodOptions)
+	WebRouter.HandleFunc("/city/update/{id}/", hCity.UpdateCityById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/city/get/{id}/", hCity.GetCityById).Methods(http.MethodGet, http.MethodOptions)
+	WebRouter.HandleFunc("/city/disband/{id}/", hCity.DisbandCityById).Methods(http.MethodGet, http.MethodOptions).Name("protected_poll_view")
 
 	//Health
 	WebRouter.HandleFunc("/events/health", hEvents.Health).Methods(http.MethodGet, http.MethodOptions)

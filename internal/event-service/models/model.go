@@ -5,7 +5,8 @@ import (
 	"github.com/jinzhu/gorm"
 	"regexp"
 
-	"github.com/Miroshinsv/disko_go/internal/poll-service/models"
+	cityModel "github.com/Miroshinsv/disko_go/internal/city-service/models"
+	pollModel "github.com/Miroshinsv/disko_go/internal/poll-service/models"
 )
 
 var regReplace = regexp.MustCompile("[{}\"]")
@@ -16,48 +17,38 @@ type EventsType struct {
 	IsRepeatable   bool
 }
 
-type City struct {
-	gorm.Model
-	CityName string `json:"city_name"`
-	Country  string `json:"country"`
-}
-
-func (City) TableName() string {
-	return "city"
-}
-
 type Events struct {
 	gorm.Model
-	Type        EventsType    `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
-	Polls       []models.Poll `gorm:"foreignKey:EventId"`
-	TypeId      int           `json:"type_id"`
-	Name        string        `json:"name"`
-	Days        string        `json:"days"`
-	IsActive    bool          `json:"is_active"`
-	Description string        `json:"description"`
-	Price       string        `json:"price"`
-	StartTime   string        `json:"start_time"`
-	Logo        string        `json:"logo"`
-	Lat         float32       `json:"lat"`
-	Lng         float32       `json:"lng"`
-	OwnerId     uint          `json:"owner_id"`
-	City        City
+	Type        EventsType       `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
+	Polls       []pollModel.Poll `gorm:"foreignKey:EventId"`
+	TypeId      int              `json:"type_id"`
+	Name        string           `json:"name"`
+	Days        string           `json:"days"`
+	IsActive    bool             `json:"is_active"`
+	Description string           `json:"description"`
+	Price       string           `json:"price"`
+	StartTime   string           `json:"start_time"`
+	Logo        string           `json:"logo"`
+	Lat         float32          `json:"lat"`
+	Lng         float32          `json:"lng"`
+	OwnerId     uint             `json:"owner_id"`
+	City        cityModel.City
 	CityID      int
 }
 
 func (d *Events) UnmarshalJSON(data []byte) error {
 	type income struct {
-		TypeId      int     `json:"type_id"`
-		Name        string  `json:"name"`
-		Days        string  `json:"days"`
-		IsActive    bool    `json:"is_active"`
-		Description string  `json:"description"`
-		Price       string  `json:"price"`
-		StartTime   string  `json:"start_time"`
-		Logo        string  `json:"logo"`
-		Lat         float32 `json:"lat"`
-		Lng         float32 `json:"lng"`
-		City        City    `json:"city_id"`
+		TypeId      int            `json:"type_id"`
+		Name        string         `json:"name"`
+		Days        string         `json:"days"`
+		IsActive    bool           `json:"is_active"`
+		Description string         `json:"description"`
+		Price       string         `json:"price"`
+		StartTime   string         `json:"start_time"`
+		Logo        string         `json:"logo"`
+		Lat         float32        `json:"lat"`
+		Lng         float32        `json:"lng"`
+		City        cityModel.City `json:"city_id"`
 	}
 
 	var inc income
@@ -83,18 +74,18 @@ func (d *Events) UnmarshalJSON(data []byte) error {
 func (d Events) MarshalJSON() ([]byte, error) {
 	type outcome struct {
 		gorm.Model
-		Type        EventsType    `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
-		Polls       []models.Poll `gorm:"foreignKey:EventId"`
-		Name        string        `json:"name"`
-		Days        string        `json:"days"`
-		IsActive    bool          `json:"is_active"`
-		Description string        `json:"description"`
-		Price       string        `json:"price"`
-		StartTime   string        `json:"start_time"`
-		Logo        string        `json:"logo"`
-		Lat         float32       `json:"lat"`
-		Lng         float32       `json:"lng"`
-		City        City          `gorm:"ForeignKey:CityId"`
+		Type        EventsType       `gorm:"ForeignKey:TypeId;AssociationForeignKey:id"`
+		Polls       []pollModel.Poll `gorm:"foreignKey:EventId"`
+		Name        string           `json:"name"`
+		Days        string           `json:"days"`
+		IsActive    bool             `json:"is_active"`
+		Description string           `json:"description"`
+		Price       string           `json:"price"`
+		StartTime   string           `json:"start_time"`
+		Logo        string           `json:"logo"`
+		Lat         float32          `json:"lat"`
+		Lng         float32          `json:"lng"`
+		City        cityModel.City   `gorm:"ForeignKey:CityId"`
 	}
 
 	for i, j := 0, len(d.Polls)-1; i < j; i, j = i+1, j-1 {
