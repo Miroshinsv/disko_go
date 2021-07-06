@@ -34,6 +34,7 @@ func CORSMethodMiddleware(r *mux.Router) mux.MiddlewareFunc {
 		})
 	}
 }
+
 func AuthAdminMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get(AuthHeader)
@@ -55,8 +56,8 @@ func AuthAdminMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		if !dbUser.Roles[0].Admin {
-			w.WriteHeader(http.StatusBadRequest)
+		if !dbUser.IsAdmin() {
+			w.WriteHeader(http.StatusForbidden)
 			return
 		}
 

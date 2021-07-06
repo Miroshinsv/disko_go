@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Miroshinsv/disko_go/internal/event-service/models"
-	models2 "github.com/Miroshinsv/disko_go/internal/user-service"
+	userModel "github.com/Miroshinsv/disko_go/internal/user-service"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -38,16 +39,30 @@ func (h Handler) LoadAllEvents(w http.ResponseWriter, r *http.Request) {
 	stm := h.conn.GetConnection().Preload("Type").
 		Preload("Polls").
 		Joins("LEFT JOIN events_types ON events.type_id = events_types.id").
-		Where("events.is_active = true")
+		Where("events.is_active = true").
+		Preload("City").
+		Joins("LEFT JOIN city ON events.city_id = city.id")
 
-	if u, ok := r.Context().Value("user").(*models2.Users); ok {
+	if u, ok := r.Context().Value("user").(*userModel.Users); ok {
 		stm = stm.Where(fmt.Sprintf("events.owner_id = %d", u.ID))
 	}
 
-	stm.
-		Find(
-			&events,
-		)
+	city := r.URL.Query().Get("city")
+
+	if city == "" {
+		stm.
+			Find(
+				&events,
+			)
+
+	} else {
+		stm.
+			Where("city_name = ?", strings.Title(strings.ToLower(city))).
+			Find(
+				&events,
+			)
+
+	}
 
 	w.WriteHeader(http.StatusOK)
 	_ = json.NewEncoder(w).Encode(events)

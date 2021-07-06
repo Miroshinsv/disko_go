@@ -37,6 +37,7 @@ func main() {
 	web := webServer.MustNewWebServer(&webConf, log)
 	web_server.RegisterHandlers()
 	web.RegisterRoutes(web_server.WebRouter)
+
 	go func() {
 		err := web.ListenAndServe(context.Background())
 		if err != nil {
@@ -46,6 +47,7 @@ func main() {
 
 	registerAutoPolls(log)
 	registerShutdown(context.Background(), log, web)
+
 }
 
 func bootstrap() (configService.IConfig, loggerService.ILogger) {
