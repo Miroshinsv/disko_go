@@ -37,32 +37,18 @@ func CORSMethodMiddleware(r *mux.Router) mux.MiddlewareFunc {
 
 func AuthAdminMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token := r.Header.Get(AuthHeader)
-		if token == "" {
-			if strings.Contains(mux.CurrentRoute(r).GetName(), protectedPrefixAdmin) {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
+		if !strings.Contains(mux.CurrentRoute(r).GetName(), protectedPrefixAdmin) {
 			next.ServeHTTP(w, r)
-
 			return
 		}
+
+		token := r.Header.Get(AuthHeader)
 
 		authSrv := authService.GetAuthService()
-		dbUser, err := authSrv.GetUserByJWT(token, authService.JWTAuthAudience)
-
-		if dbUser == nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
+		dbUser, _ := authSrv.GetUserByJWT(token, authService.JWTAuthAudience)
 
 		if !dbUser.IsAdmin() {
 			w.WriteHeader(http.StatusForbidden)
-			return
-		}
-
-		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
 			return
 		}
 
@@ -72,6 +58,7 @@ func AuthAdminMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+
 func AuthMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get(AuthHeader)
