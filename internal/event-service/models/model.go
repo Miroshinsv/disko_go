@@ -38,17 +38,17 @@ type Events struct {
 
 func (d *Events) UnmarshalJSON(data []byte) error {
 	type income struct {
-		TypeId      int            `json:"type_id"`
-		Name        string         `json:"name"`
-		Days        string         `json:"days"`
-		IsActive    bool           `json:"is_active"`
-		Description string         `json:"description"`
-		Price       string         `json:"price"`
-		StartTime   string         `json:"start_time"`
-		Logo        string         `json:"logo"`
-		Lat         float32        `json:"lat"`
-		Lng         float32        `json:"lng"`
-		City        cityModel.City `json:"city_id"`
+		TypeId      int     `json:"type_id"`
+		Name        string  `json:"name"`
+		Days        string  `json:"days"`
+		IsActive    bool    `json:"is_active"`
+		Description string  `json:"description"`
+		Price       string  `json:"price"`
+		StartTime   string  `json:"start_time"`
+		Logo        string  `json:"logo"`
+		Lat         float32 `json:"lat"`
+		Lng         float32 `json:"lng"`
+		CityID      int     `json:"city_id"`
 	}
 
 	var inc income
@@ -67,7 +67,7 @@ func (d *Events) UnmarshalJSON(data []byte) error {
 	d.Logo = inc.Logo
 	d.Lat = inc.Lat
 	d.Lng = inc.Lng
-	d.City = inc.City
+	d.CityID = inc.CityID
 	return nil
 }
 
@@ -85,7 +85,7 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		Logo        string           `json:"logo"`
 		Lat         float32          `json:"lat"`
 		Lng         float32          `json:"lng"`
-		City        cityModel.City   `gorm:"ForeignKey:CityId"`
+		City        cityModel.City
 	}
 
 	for i, j := 0, len(d.Polls)-1; i < j; i, j = i+1, j-1 {
@@ -109,4 +109,14 @@ func (d Events) MarshalJSON() ([]byte, error) {
 	}
 
 	return json.Marshal(out)
+}
+
+var DayofWeekNames = [...]string{
+	"sunday",
+	"monday",
+	"tuesday",
+	"wednesday",
+	"thursday",
+	"friday",
+	"saturday",
 }

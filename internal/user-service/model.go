@@ -32,3 +32,17 @@ func (u Users) IsAdmin() bool {
 
 	return false
 }
+
+func (u Users) IsSchoolAdmin() bool {
+	if len(u.Roles) == 0 {
+		return false
+	}
+
+	for _, v := range u.Roles {
+		if v.SchoolAdmin || v.Admin {
+			return true
+		}
+	}
+
+	return false
+}

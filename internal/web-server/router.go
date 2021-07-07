@@ -25,6 +25,7 @@ func RegisterHandlers() {
 	WebRouter.Use(middleware.CORSMethodMiddleware(WebRouter))
 	WebRouter.Use(middleware.AuthMiddleware)
 	WebRouter.Use(middleware.AuthAdminMiddleware)
+	WebRouter.Use(middleware.AuthSchoolAdminMiddleware)
 
 	WebRouter.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -42,10 +43,10 @@ func RegisterHandlers() {
 	hEvents := eventService.MustNewHandlerEvent()
 	WebRouter.HandleFunc("/events/get/all/", hEvents.GetAllEvents).Methods(http.MethodGet, http.MethodOptions)
 	WebRouter.HandleFunc("/events/get/{id}/", hEvents.GetEventById).Methods(http.MethodGet, http.MethodOptions)
-	WebRouter.HandleFunc("/events/add/", hEvents.AddEvent).Methods(http.MethodPost, http.MethodOptions).Name("protected_event_add")
-	WebRouter.HandleFunc("/events/update/{id}/", hEvents.UpdateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_event_update")
-	WebRouter.HandleFunc("/events/activate/{id}/", hEvents.ActivateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
-	WebRouter.HandleFunc("/events/deactivate/{id}/", hEvents.DeactivateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/events/add/", hEvents.AddEvent).Methods(http.MethodPost, http.MethodOptions).Name("protected_school")
+	WebRouter.HandleFunc("/events/update/{id}/", hEvents.UpdateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_school")
+	WebRouter.HandleFunc("/events/activate/{id}/", hEvents.ActivateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_school")
+	WebRouter.HandleFunc("/events/deactivate/{id}/", hEvents.DeactivateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_school")
 	WebRouter.HandleFunc("/events/disband/{id}/", hEvents.DeleteEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
 	WebRouter.HandleFunc("/events/types/all/", hEvents.GetEventsType).Methods(http.MethodGet, http.MethodOptions).Name("protected_event_type_get")
 

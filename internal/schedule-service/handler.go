@@ -16,16 +16,6 @@ const (
 	timeFormat = "2006-01-02"
 )
 
-var names = [...]string{
-	"sunday",
-	"monday",
-	"tuesday",
-	"wednesday",
-	"thursday",
-	"friday",
-	"saturday",
-}
-
 type Handler struct {
 	log  loggerService.ILogger
 	conn dbConnector.IConnector

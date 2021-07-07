@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	AuthHeader           = "X-Token"
-	protectedPrefix      = "protected_"
-	protectedPrefixAdmin = "protected_admin"
+	AuthHeader                 = "X-Token"
+	protectedPrefix            = "protected_"
+	protectedPrefixAdmin       = "protected_admin"
+	protectedPrefixSchoolAdmin = "protected_school"
 )
 
 func CORSMethodMiddleware(r *mux.Router) mux.MiddlewareFunc {
@@ -34,10 +35,37 @@ func CORSMethodMiddleware(r *mux.Router) mux.MiddlewareFunc {
 		})
 	}
 }
+func checkPrefix(r *http.Request, prefix string) bool {
+	return strings.Contains(mux.CurrentRoute(r).GetName(), prefix)
+}
+
+func AuthSchoolAdminMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !checkPrefix(r, protectedPrefixSchoolAdmin) {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		token := r.Header.Get(AuthHeader)
+
+		authSrv := authService.GetAuthService()
+		dbUser, _ := authSrv.GetUserByJWT(token, authService.JWTAuthAudience)
+
+		if !dbUser.IsSchoolAdmin() {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), "user", dbUser)
+		r = r.WithContext(ctx)
+
+		next.ServeHTTP(w, r)
+	})
+}
 
 func AuthAdminMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if !strings.Contains(mux.CurrentRoute(r).GetName(), protectedPrefixAdmin) {
+		if !checkPrefix(r, protectedPrefixAdmin) {
 			next.ServeHTTP(w, r)
 			return
 		}
@@ -75,6 +103,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 
 		authSrv := authService.GetAuthService()
 		dbUser, err := authSrv.GetUserByJWT(token, authService.JWTAuthAudience)
+
 		if err != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 

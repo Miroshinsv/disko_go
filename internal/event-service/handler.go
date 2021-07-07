@@ -11,6 +11,7 @@ import (
 	"github.com/pkg/errors"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type Handler struct {
@@ -126,6 +127,7 @@ func (h Handler) GetAllEvents(w http.ResponseWriter, _ *http.Request) {
 func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {
 	var event models.Events
 	rErr := json.NewDecoder(r.Body).Decode(&event)
+	event.Days = strings.ToLower(event.Days)
 	if rErr != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode("Invalid event: " + rErr.Error())
@@ -134,11 +136,17 @@ func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {
 
 	event.OwnerId = r.Context().Value("user").(*userService.Users).ID
 
+	if !h.contains(event.Days) {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode(fmt.Sprintf("Invalid day of week: %s", event.Days))
+		return
+	}
+
 	err := h.conn.GetConnection().Save(&event)
 	if err.Error != nil {
 		_ = json.NewEncoder(w).Encode(cantUpdateEvent.Error())
 	} else {
-		h.conn.GetConnection().Preload("Type").Find(&event, event.ID)
+		h.conn.GetConnection().Preload("City").Preload("Type").Find(&event, event.ID)
 		_ = json.NewEncoder(w).Encode(event)
 	}
 }
@@ -185,4 +193,15 @@ func MustNewHandlerEvent() *Handler {
 		conn:         db,
 		eventService: MustNewEventService(log, db),
 	}
+}
+
+func (h Handler) contains(str string) bool {
+
+	for _, v := range models.DayofWeekNames {
+		if v == str {
+			return true
+		}
+	}
+
+	return false
 }
