@@ -41,7 +41,7 @@ func RegisterHandlers() {
 
 	//Events
 	hEvents := eventService.MustNewHandlerEvent()
-	WebRouter.HandleFunc("/events/get/all/", hEvents.GetAllEvents).Methods(http.MethodGet, http.MethodOptions)
+	WebRouter.HandleFunc("/events/get/all/", hEvents.GetAllEvents).Methods(http.MethodGet, http.MethodOptions).Name("protected_school")
 	WebRouter.HandleFunc("/events/get/{id}/", hEvents.GetEventById).Methods(http.MethodGet, http.MethodOptions)
 	WebRouter.HandleFunc("/events/add/", hEvents.AddEvent).Methods(http.MethodPost, http.MethodOptions).Name("protected_school")
 	WebRouter.HandleFunc("/events/update/{id}/", hEvents.UpdateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_school")
