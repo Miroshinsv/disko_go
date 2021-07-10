@@ -69,7 +69,7 @@ func RegisterHandlers() {
 	//Users
 	hUsers := userService.MustNewHandlerUser()
 	WebRouter.HandleFunc("/user/get/all/", hUsers.GetAllUsers).Methods(http.MethodGet, http.MethodOptions).Name("protected_admin")
-	WebRouter.HandleFunc("/user/get/{id}/", hUsers.GetUserById).Methods(http.MethodGet, http.MethodOptions).Name("protected_admin")
+	WebRouter.HandleFunc("/user/get/{id}/", hUsers.GetUserById).Methods(http.MethodGet, http.MethodOptions)
 	WebRouter.HandleFunc("/user/update/{id}/", hUsers.UpdateUserById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
 	WebRouter.HandleFunc("/user/disband/{id}/", hUsers.DisbandUserById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
 	WebRouter.HandleFunc("/user/add/", hUsers.AddUser).Methods(http.MethodPost, http.MethodOptions)
