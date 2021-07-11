@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/Miroshinsv/disko_go/internal/event-service/models"
+	userModel "github.com/Miroshinsv/disko_go/internal/user-service"
 	userService "github.com/Miroshinsv/disko_go/internal/user-service"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
@@ -112,16 +113,22 @@ func (h Handler) GetEventById(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewEncoder(w).Encode(events)
 }
 
-func (h Handler) GetAllEvents(w http.ResponseWriter, _ *http.Request) {
+func (h Handler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
 	var events []models.Events
-	h.conn.GetConnection().
-		Preload("Type").
-		Preload("Polls").
-		Find(&events)
 
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(events)
+	if u, ok := r.Context().Value("user").(*userModel.Users); ok {
+		h.conn.GetConnection().
+			Preload("Type").
+			Preload("Polls").
+			Where(fmt.Sprintf("events.owner_id = %d", u.ID)).
+			Find(&events)
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(http.StatusOK)
+		_ = json.NewEncoder(w).Encode(events)
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		_ = json.NewEncoder(w).Encode("Undefined user id")
+	}
 }
 
 func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {

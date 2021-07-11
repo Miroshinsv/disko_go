@@ -2,9 +2,7 @@ package schedule_service
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/Miroshinsv/disko_go/internal/event-service/models"
-	userModel "github.com/Miroshinsv/disko_go/internal/user-service"
 	dbConnector "github.com/Miroshinsv/disko_go/pkg/db-connector"
 	loggerService "github.com/Miroshinsv/disko_go/pkg/logger-service"
 	"net/http"
@@ -32,10 +30,6 @@ func (h Handler) LoadAllEvents(w http.ResponseWriter, r *http.Request) {
 		Where("events.is_active = true").
 		Preload("City").
 		Joins("LEFT JOIN city ON events.city_id = city.id")
-
-	if u, ok := r.Context().Value("user").(*userModel.Users); ok {
-		stm = stm.Where(fmt.Sprintf("events.owner_id = %d", u.ID))
-	}
 
 	city := r.URL.Query().Get("city")
 
