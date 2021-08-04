@@ -43,7 +43,7 @@ func (h Handler) DeleteEventById(w http.ResponseWriter, r *http.Request) {
 
 	h.conn.GetConnection().Where(models.Events{}, i).Delete(&models.Events{}, i)
 	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(invalidEventId.Error())
+	_ = json.NewEncoder(w).Encode("Event deleted")
 }
 
 func (h Handler) DeactivateEventById(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +121,9 @@ func (h Handler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
 			Preload("Type").
 			Preload("Polls").
 			Where(fmt.Sprintf("events.owner_id = %d", u.ID)).
+			Preload("City").
 			Find(&events)
+
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.WriteHeader(http.StatusOK)
 		_ = json.NewEncoder(w).Encode(events)
