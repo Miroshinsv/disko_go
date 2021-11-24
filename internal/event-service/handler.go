@@ -116,21 +116,41 @@ func (h Handler) GetEventById(w http.ResponseWriter, r *http.Request) {
 func (h Handler) GetAllEvents(w http.ResponseWriter, r *http.Request) {
 	var events []models.Events
 
-	if u, ok := r.Context().Value("user").(*userModel.Users); ok {
-		h.conn.GetConnection().
-			Preload("Type").
-			Preload("Polls").
-			Where(fmt.Sprintf("events.owner_id = %d", u.ID)).
-			Preload("City").
-			Find(&events)
+	var (
+		owner, isOwner = r.Context().Value("user").(*userModel.Users)
+		ownerID int
+	)
 
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.WriteHeader(http.StatusOK)
-		_ = json.NewEncoder(w).Encode(events)
-	} else {
+	if !isOwner {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode("Undefined user id")
+
+		return
 	}
+
+	if owner.IsAdmin() {
+		ownerIDString := r.URL.Query().Get("owner_id")
+		ownerID, err := strconv.Atoi(ownerIDString)
+		if err != nil || ownerID == 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			_ = json.NewEncoder(w).Encode("Undefined owner_id")
+
+			return
+		}
+	} else {
+		ownerID = int(owner.ID)
+	}
+
+	h.conn.GetConnection().
+		Preload("Type").
+		Preload("Polls").
+		Where(fmt.Sprintf("events.owner_id = %d", ownerID)).
+		Preload("City").
+		Find(&events)
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.WriteHeader(http.StatusOK)
+	_ = json.NewEncoder(w).Encode(events)
 }
 
 func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {
@@ -143,7 +163,10 @@ func (h Handler) AddEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	event.OwnerId = r.Context().Value("user").(*userService.Users).ID
+	owner := r.Context().Value("user").(*userService.Users)
+	if owner.IsAdmin() {
+		event.OwnerId = owner.ID
+	}
 
 	if !h.contains(event.Days) {
 		w.WriteHeader(http.StatusBadRequest)
@@ -170,9 +193,27 @@ func (h Handler) UpdateEventById(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	var (
+		owner = r.Context().Value("user").(*userService.Users)
+		ownerID = owner.ID
+	)
+
+	if owner.IsAdmin() {
+		event, err := h.eventService.GetByID(i)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			_ = json.NewEncoder(w).Encode(invalidEventId.Error())
+
+			return
+		}
+
+		ownerID = event.OwnerId
+	}
+
 	//@todo: cover error
 	_ = json.NewDecoder(r.Body).Decode(&nEvent)
-	err = h.eventService.Update(i, r.Context().Value("user").(*userService.Users).ID, &nEvent)
+	err = h.eventService.Update(i, ownerID, &nEvent)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_ = json.NewEncoder(w).Encode(err.Error())
