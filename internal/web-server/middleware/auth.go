@@ -51,7 +51,7 @@ func AuthSchoolAdminMiddleware(next http.Handler) http.Handler {
 		authSrv := authService.GetAuthService()
 		dbUser, _ := authSrv.GetUserByJWT(token, authService.JWTAuthAudience)
 
-		if !dbUser.IsSchoolAdmin() {
+		if !dbUser.IsSchoolAdmin() && !dbUser.IsAdmin() {
 			w.WriteHeader(http.StatusForbidden)
 			return
 		}

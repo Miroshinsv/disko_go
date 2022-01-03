@@ -19,6 +19,17 @@ var (
 	errorFindEventTypes          = errors.New("Can't find any events type")
 )
 
+func (s Service) GetByID(eID int) (*models.Events, error) {
+	var result *models.Events
+
+	err := s.conn.GetConnection().Where("id = ?", eID).Take(&result).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (s Service) Update(eId int, uId uint, event *models.Events) error {
 	err := s.conn.GetConnection().Model(event).Where(fmt.Sprintf("id=%d AND owner_id=%d", eId, uId)).Update(event)
 	if err.RowsAffected == 0 {
