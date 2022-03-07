@@ -29,7 +29,7 @@ func (h Handler) LoadAllEvents(w http.ResponseWriter, r *http.Request) {
 		Joins("LEFT JOIN events_types ON events.type_id = events_types.id").
 		Where("events.is_active = true").
 		Preload("City").
-		Joins("LEFT JOIN city ON events.city_id = city.id")
+		Preload("Dj")
 
 	city := r.URL.Query().Get("city")
 

@@ -72,11 +72,18 @@ func (s Service) Vote(poll *models.Poll, user *userService.Users) error {
 		return errorAlreadyVoted
 	}
 
-	return s.conn.GetConnection().Create(&models.Vote{
+	err := s.conn.GetConnection().Create(&models.Vote{
 		PollId:    int(poll.ID),
 		UserId:    int(user.ID),
 		CreatedAt: time.Now(),
 	}).Error
+
+	if err != nil {
+		return err
+	}
+	poll.VoteCount++
+
+	return s.conn.GetConnection().Save(poll).Error
 }
 
 func (s Service) ShowResults(poll *models.Poll, user *userService.Users) ([]models.Vote, error) {

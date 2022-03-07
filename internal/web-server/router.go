@@ -48,7 +48,7 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/events/activate/{id}/", hEvents.ActivateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_school")
 	WebRouter.HandleFunc("/events/deactivate/{id}/", hEvents.DeactivateEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_school")
 	WebRouter.HandleFunc("/events/disband/{id}/", hEvents.DeleteEventById).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
-	WebRouter.HandleFunc("/events/types/all/", hEvents.GetEventsType).Methods(http.MethodGet, http.MethodOptions).Name("protected_event_type_get")
+	WebRouter.HandleFunc("/events/types/all/", hEvents.GetEventsType).Methods(http.MethodGet, http.MethodOptions)
 
 	//Roles
 	hRoles := roleService.MustNewHandlerRole()
@@ -92,6 +92,7 @@ func RegisterHandlers() {
 	WebRouter.HandleFunc("/poll/update/{id}/", hPoll.Update).Methods(http.MethodPost, http.MethodOptions).Name("protected_admin")
 	WebRouter.HandleFunc("/poll/vote/{id}/", hPoll.Vote).Methods(http.MethodGet, http.MethodOptions).Name("protected_poll_vote")
 	WebRouter.HandleFunc("/poll/view/{id}/", hPoll.View).Methods(http.MethodGet, http.MethodOptions).Name("protected_poll_view")
+	//deprecated
 	WebRouter.HandleFunc("/poll/count/{id}/", hPoll.ShowCount).Methods(http.MethodGet, http.MethodOptions)
 
 	//Cities

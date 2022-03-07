@@ -23,6 +23,8 @@ func (s Service) LoadEventsForDate(d time.Time) ([]models.Events, error) {
 	}
 
 	conn.GetConnection().Preload("Type").
+		Preload("City").
+		Preload("Dj").
 		Preload("Polls").
 		Joins("LEFT JOIN events_types ON events.type_id = events_types.id").
 		Where(fmt.Sprintf("'%s' = events.days AND events.is_active = true", models.DayofWeekNames[d.Weekday()])).

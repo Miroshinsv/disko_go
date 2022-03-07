@@ -7,6 +7,7 @@ import (
 
 	cityModel "github.com/Miroshinsv/disko_go/internal/city-service/models"
 	pollModel "github.com/Miroshinsv/disko_go/internal/poll-service/models"
+	userModel "github.com/Miroshinsv/disko_go/internal/user-service"
 )
 
 var regReplace = regexp.MustCompile("[{}\"]")
@@ -34,6 +35,8 @@ type Events struct {
 	OwnerId     uint             `json:"owner_id"`
 	City        cityModel.City
 	CityID      int
+	Dj          userModel.Users `gorm:"ForeignKey:DjID;AssociationForeignKey:id"`
+	DjID        int             `json:"dj_id"`
 }
 
 func (d *Events) UnmarshalJSON(data []byte) error {
@@ -49,6 +52,7 @@ func (d *Events) UnmarshalJSON(data []byte) error {
 		Lat         float32 `json:"lat"`
 		Lng         float32 `json:"lng"`
 		CityID      int     `json:"city_id"`
+		DjID        int     `json:"dj_id"`
 	}
 
 	var inc income
@@ -68,6 +72,7 @@ func (d *Events) UnmarshalJSON(data []byte) error {
 	d.Lat = inc.Lat
 	d.Lng = inc.Lng
 	d.CityID = inc.CityID
+	d.DjID = inc.DjID
 	return nil
 }
 
@@ -86,6 +91,7 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		Lat         float32          `json:"lat"`
 		Lng         float32          `json:"lng"`
 		City        cityModel.City
+		Dj          userModel.Users
 	}
 
 	for i, j := 0, len(d.Polls)-1; i < j; i, j = i+1, j-1 {
@@ -106,6 +112,7 @@ func (d Events) MarshalJSON() ([]byte, error) {
 		Lat:         d.Lat,
 		Lng:         d.Lng,
 		City:        d.City,
+		Dj:          d.Dj,
 	}
 
 	return json.Marshal(out)
